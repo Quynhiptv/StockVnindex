@@ -163,11 +163,15 @@ const ActiveBuySell: React.FC = () => {
   }, []);
 
   const buyList = useMemo(() => 
-    data.filter(d => d.netFlowPercent > 0).sort((a, b) => b.netFlowPercent - a.netFlowPercent), 
+    data
+      .filter(d => d.netFlowPercent > 0 && (d.buyVol + d.sellVol) > 300000)
+      .sort((a, b) => b.netFlowPercent - a.netFlowPercent), 
   [data]);
 
   const sellList = useMemo(() => 
-    data.filter(d => d.netFlowPercent < 0).sort((a, b) => a.netFlowPercent - b.netFlowPercent), 
+    data
+      .filter(d => d.netFlowPercent < 0 && (d.buyVol + d.sellVol) > 300000)
+      .sort((a, b) => a.netFlowPercent - b.netFlowPercent), 
   [data]);
 
   if (loading && data.length === 0) {
