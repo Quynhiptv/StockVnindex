@@ -1,13 +1,54 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MarketTab } from './types';
 import Banner from './components/Banner';
 import DashboardTabs from './components/DashboardTabs';
 import MarketOverview from './components/MarketOverview';
 import ForeignFlow from './components/ForeignFlow';
+import ATCForeign from './components/ATCForeign';
+import ATCPriceAction from './components/ATCPriceAction';
+import StockList from './components/StockList';
+import VolumeSurge from './components/VolumeSurge';
+import BullBearAction from './components/BullBearAction';
+import ActiveBuySell from './components/ActiveBuySell';
+import BigOrderFilter from './components/BigOrderFilter';
+import RecommendationPortfolio from './components/RecommendationPortfolio';
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<MarketTab>(MarketTab.OVERVIEW);
+  const [activeTab, setActiveTab] = useState<MarketTab>(() => {
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab && Object.values(MarketTab).includes(savedTab as MarketTab)) {
+      return savedTab as MarketTab;
+    }
+    return MarketTab.OVERVIEW;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('activeTab', activeTab);
+  }, [activeTab]);
+  const [marketStatus, setMarketStatus] = useState({ isOpen: false, text: '' });
+
+  useEffect(() => {
+    const updateStatus = () => {
+      const now = new Date();
+      const day = now.getDay();
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+      const isWeekend = day === 0 || day === 6;
+      
+      const isTradingHours = (hour === 9 && minute >= 0) || (hour > 9 && hour < 15);
+
+      if (!isWeekend && isTradingHours) {
+        setMarketStatus({ isOpen: true, text: 'SÀN HOSE: ĐANG KHỚP LỆNH' });
+      } else {
+        setMarketStatus({ isOpen: false, text: 'SÀN HOSE: ĐANG NGHỈ GIAO DỊCH' });
+      }
+    };
+
+    updateStatus();
+    const interval = setInterval(updateStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -16,59 +57,83 @@ const App: React.FC = () => {
       case MarketTab.FOREIGN_FLOW:
         return <ForeignFlow />;
       case MarketTab.VOLUME_SURGE:
+        return <VolumeSurge />;
       case MarketTab.BULL_BEAR:
+        return <BullBearAction />;
       case MarketTab.BIG_ORDER:
-      case MarketTab.ACTIVE_BUY_SELL:
-      case MarketTab.SECTORS:
-      case MarketTab.ATC_PRICE_ACTION:
+        return <BigOrderFilter />;
       case MarketTab.ATC_FOREIGN:
+        return <ATCForeign />;
+      case MarketTab.ATC_PRICE_ACTION:
+        return <ATCPriceAction />;
+      case MarketTab.ACTIVE_BUY_SELL:
+        return <ActiveBuySell />;
       case MarketTab.STOCK_LIST:
+        return <StockList />;
+      case MarketTab.RECOMMENDATIONS:
+        return <RecommendationPortfolio />;
+      default:
         return (
-          <div className="flex flex-col items-center justify-center py-20 bg-slate-800/30 border border-dashed border-slate-700 rounded-2xl animate-pulse">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          <div className="flex flex-col items-center justify-center py-24 bg-white border border-dashed border-slate-200 rounded-[2.5rem]">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-slate-200 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-            <h3 className="text-xl font-bold text-slate-400">Dữ liệu {activeTab} đang được tải...</h3>
-            <p className="text-slate-500 mt-2">Tính năng này sẽ sớm ra mắt trong phiên bản cập nhật tới.</p>
+            <h3 className="text-xl font-black text-slate-400 uppercase tracking-[0.2em]">Tính năng đang phát triển</h3>
+            <p className="text-slate-400 mt-3 text-sm font-medium">Dữ liệu {activeTab} sẽ sớm ra mắt.</p>
           </div>
         );
-      default:
-        return <MarketOverview />;
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col pb-10 bg-[#0f172a]">
-      {/* Top Banner */}
+    <div className="min-h-screen flex flex-col pb-10 bg-slate-50 selection:bg-blue-100 selection:text-blue-900">
       <header>
         <Banner />
       </header>
 
-      {/* Navigation Tabs */}
-      <DashboardTabs 
-        activeTab={activeTab} 
-        onTabChange={(tab) => setActiveTab(tab)} 
-      />
+      <div className="sticky top-0 z-40">
+        <DashboardTabs 
+          activeTab={activeTab} 
+          onTabChange={(tab) => {
+            setActiveTab(tab);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }} 
+        />
+      </div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 md:px-8 mt-8 flex-grow">
-        <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-black flex items-center gap-3">
-                <span className="w-8 h-1 bg-blue-500 rounded-full"></span>
-                {activeTab}
-            </h2>
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Sàn HOSE: Đang khớp lệnh
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 mt-6 md:mt-10 flex-grow max-w-7xl">
+        <div className="mb-8 md:mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+                <div className="w-2 h-10 bg-blue-600 rounded-full shrink-0 shadow-lg shadow-blue-200"></div>
+                <h2 className="text-2xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">
+                    {activeTab}
+                </h2>
+            </div>
+            
+            <div className="flex items-center gap-3 px-6 py-3 bg-white border border-slate-200 rounded-2xl shadow-sm self-start sm:self-auto ring-1 ring-slate-100">
+                <div className={`w-3 h-3 rounded-full ${marketStatus.isOpen ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500'}`}></div>
+                <span className="text-[12px] font-black text-slate-700 uppercase tracking-widest leading-none">
+                    {marketStatus.text}
+                </span>
             </div>
         </div>
         
-        {renderContent()}
+        <div className="transition-all duration-500 transform">
+          {renderContent()}
+        </div>
       </main>
 
-      {/* Floating Action for Mobile / Support */}
-      <button className="fixed bottom-6 right-6 md:bottom-10 md:right-10 w-14 h-14 bg-emerald-500 rounded-full shadow-2xl flex items-center justify-center hover:bg-emerald-400 transition-all hover:scale-110 z-40 group">
-         <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-         </svg>
-         <div className="absolute right-16 bg-slate-900 text-
+      <footer className="mt-20 container mx-auto px-4 text-center border-t border-slate-200 pt-12">
+         <div className="flex flex-col items-center gap-4">
+           <div className="w-10 h-1 bg-slate-200 rounded-full mb-2"></div>
+           <p className="text-slate-400 text-[11px] font-black tracking-[0.3em] uppercase">
+            © 2024 Đoàn Quỳnh Team • Hệ thống phân tích chứng khoán chuyên nghiệp
+           </p>
+           <p className="text-slate-300 text-[10px] italic">Dữ liệu được cập nhật từ các nguồn uy tín nhất thị trường VN</p>
+         </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;

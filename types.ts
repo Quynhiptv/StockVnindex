@@ -9,7 +9,19 @@ export enum MarketTab {
   SECTORS = 'Nhóm Ngành',
   ATC_PRICE_ACTION = 'ATC Kéo/Đạp',
   ATC_FOREIGN = 'ATC Khối Ngoại',
-  STOCK_LIST = 'Danh Sách CP'
+  STOCK_LIST = 'Danh Sách CP',
+  RECOMMENDATIONS = 'Danh Mục Khuyến Nghị'
+}
+
+export interface MarketIndexData {
+  name: string;
+  price: string;
+  changePercent: string;
+  value: string; // Col D
+  rsi: string;   // Col S
+  ma20: string;  // Col Q
+  volYesterday: string; // Col E
+  volAvg20: string;    // Col G
 }
 
 export interface StockData {
