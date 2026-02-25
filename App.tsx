@@ -13,6 +13,7 @@ import BullBearAction from './components/BullBearAction';
 import ActiveBuySell from './components/ActiveBuySell';
 import BigOrderFilter from './components/BigOrderFilter';
 import RecommendationPortfolio from './components/RecommendationPortfolio';
+import SectorAnalysis from './components/SectorAnalysis';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<MarketTab>(() => {
@@ -68,6 +69,8 @@ const App: React.FC = () => {
         return <ATCPriceAction />;
       case MarketTab.ACTIVE_BUY_SELL:
         return <ActiveBuySell />;
+      case MarketTab.SECTORS:
+        return <SectorAnalysis />;
       case MarketTab.STOCK_LIST:
         return <StockList />;
       case MarketTab.RECOMMENDATIONS:
