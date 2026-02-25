@@ -31,19 +31,46 @@ const BigOrderFilter: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch Big Order Data
-      const response = await fetch('https://docs.google.com/spreadsheets/d/1PJSaUwbHfhyVJcaJhEBI6bUw6OamvvrKPhkonSh30z8/gviz/tq?tqx=out:csv&gid=0');
-      const csvText = await response.text();
+      const timestamp = Date.now();
+      // Parallel fetch for better performance
+      const [orderRes, priceRes] = await Promise.all([
+        fetch(`https://docs.google.com/spreadsheets/d/1PJSaUwbHfhyVJcaJhEBI6bUw6OamvvrKPhkonSh30z8/gviz/tq?tqx=out:csv&gid=0&t=${timestamp}`),
+        fetch(`https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/gviz/tq?tqx=out:csv&gid=1628670680&t=${timestamp}`)
+      ]);
+
+      if (!orderRes.ok || !priceRes.ok) throw new Error('Network response was not ok');
+
+      const [csvText, priceCsvText] = await Promise.all([
+        orderRes.text(),
+        priceRes.text()
+      ]);
       
-      // Fetch Price Data
-      const priceResponse = await fetch('https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/gviz/tq?tqx=out:csv&gid=1628670680');
-      const priceCsvText = await priceResponse.text();
+      // Optimized CSV Parser
+      const parseCSVLine = (line: string) => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current.trim());
+        return result.map(col => col.replace(/^"|"$/g, '').trim());
+      };
 
       // Parse Price CSV
-      const priceRows = priceCsvText.split('\n').filter(row => row.trim() !== '');
+      const priceRows = priceCsvText.split(/\r?\n/).filter(row => row.trim() !== '');
       const priceDataMap: Record<string, StockPriceData> = {};
-      priceRows.slice(1).forEach(row => {
-        const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/^"|"$/g, '').trim());
+      
+      for (let i = 1; i < priceRows.length; i++) {
+        const cols = parseCSVLine(priceRows[i]);
         if (cols.length >= 3) {
           const symbol = cols[0].toUpperCase();
           priceDataMap[symbol] = {
@@ -54,18 +81,15 @@ const BigOrderFilter: React.FC = () => {
             rawChangePercent: cols[2]
           };
         }
-      });
+      }
       setPriceData(priceDataMap);
       
       // Parse Big Order CSV
-      const rows = csvText.split('\n').filter(row => row.trim() !== '');
-      // Skip header if it exists (usually the first row in gviz output is headers)
+      const rows = csvText.split(/\r?\n/).filter(row => row.trim() !== '');
       const dataRows = rows.slice(1);
       
       const parsedData: BigOrderData[] = dataRows.map(row => {
-        // Handle CSV with quotes and commas
-        const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/^"|"$/g, '').trim());
-        
+        const cols = parseCSVLine(row);
         if (cols.length < 6) return null;
         
         const price = parseFloat(cols[2].replace(',', '.')) || 0;
@@ -74,25 +98,25 @@ const BigOrderFilter: React.FC = () => {
         
         return {
           symbol: cols[0],
-          type: cols[1], // MUA or BÁN
+          type: cols[1],
           price: price,
           rawPrice: cols[2],
           volume: volume,
           changePercent: changePercent,
           rawChangePercent: cols[4],
           time: cols[5],
-          value: price * volume * 1000 // Price * Volume * 1000
+          value: price * volume * 1000
         };
       }).filter((item): item is BigOrderData => item !== null);
 
-      // Sort by time descending (newest first)
+      // Sort by time descending
       parsedData.sort((a, b) => b.time.localeCompare(a.time));
 
       setData(parsedData);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching big order data:', error);
-      setLoading(false);
+      if (data.length === 0) setLoading(false);
     }
   };
 
