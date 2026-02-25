@@ -131,22 +131,23 @@ const BigOrderFilter: React.FC = () => {
   };
 
   const formatValue = (num: number) => {
-    if (num >= 1000000000) return (num / 1000000000).toFixed(2) + ' Tỷ';
-    if (num >= 1000000) return (num / 1000000).toFixed(2) + ' Tr';
+    if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
+    if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
     return formatNumber(num);
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      setSelectedSymbol(searchTerm.trim().toUpperCase());
+    const term = searchTerm.trim().toUpperCase();
+    if (term) {
+      setSelectedSymbol(term);
     } else {
       setSelectedSymbol(null);
     }
   };
 
   const filteredData = useMemo(() => {
-    if (!selectedSymbol) return data;
+    if (!selectedSymbol) return [];
     return data.filter(item => item.symbol.toUpperCase() === selectedSymbol);
   }, [data, selectedSymbol]);
 
@@ -162,24 +163,29 @@ const BigOrderFilter: React.FC = () => {
     const buyValue = buyOrders.reduce((sum, item) => sum + item.value, 0);
     const sellValue = sellOrders.reduce((sum, item) => sum + item.value, 0);
     
-    // Calculate top 5 price levels for Buy and Sell
-    const getTopPriceLevels = (orders: BigOrderData[]) => {
-      const priceMap: Record<string, number> = {};
-      orders.forEach(order => {
-        const priceStr = order.rawPrice;
-        priceMap[priceStr] = (priceMap[priceStr] || 0) + order.value;
-      });
-      
-      return Object.entries(priceMap)
-        .map(([price, value]) => ({ price, value }))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 5);
-    };
+    const buyVol = buyOrders.reduce((sum, item) => sum + item.volume, 0);
+    const sellVol = sellOrders.reduce((sum, item) => sum + item.volume, 0);
 
-    const topBuyLevels = getTopPriceLevels(buyOrders);
-    const topSellLevels = getTopPriceLevels(sellOrders);
+    // Group by price for the stacked bar chart
+    const priceMap: Record<string, { price: string, buyVol: number, sellVol: number, priceNum: number }> = {};
+    filteredData.forEach(order => {
+      const p = order.rawPrice;
+      if (!priceMap[p]) {
+        priceMap[p] = { price: p, buyVol: 0, sellVol: 0, priceNum: order.price };
+      }
+      if (order.type.toUpperCase() === 'MUA') {
+        priceMap[p].buyVol += order.volume;
+      } else {
+        priceMap[p].sellVol += order.volume;
+      }
+    });
+
+    const volumeByPrice = Object.values(priceMap)
+      .sort((a, b) => a.priceNum - b.priceNum);
 
     const priceInfo = priceData[selectedSymbol];
+    const totalValue = buyValue + sellValue;
+    const buyRatio = totalValue > 0 ? (buyValue / totalValue) * 100 : 0;
 
     return {
       symbol: selectedSymbol,
@@ -191,11 +197,12 @@ const BigOrderFilter: React.FC = () => {
       sellCount,
       buyValue,
       sellValue,
-      topBuyLevels,
-      topSellLevels,
+      buyRatio,
+      volumeByPrice,
+      totalOrders: filteredData.length,
       pieData: [
-        { name: 'Mua', value: buyValue, count: buyCount },
-        { name: 'Bán', value: sellValue, count: sellCount }
+        { name: 'Mua', value: buyValue },
+        { name: 'Bán', value: sellValue }
       ]
     };
   }, [selectedSymbol, filteredData, priceData]);
@@ -231,277 +238,277 @@ const BigOrderFilter: React.FC = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm ring-1 ring-slate-100 max-w-2xl mx-auto w-full">
-        <form onSubmit={handleSearch} className="flex items-center gap-2">
-          <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <input 
-              type="text" 
-              placeholder="Nhập mã chứng khoán (VD: VND)..." 
-              className="w-full pl-12 pr-4 py-3 bg-transparent text-slate-900 font-medium placeholder:text-slate-400 focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="max-w-3xl mx-auto w-full">
+        <form onSubmit={handleSearch} className="flex items-center gap-0 bg-white rounded-full border border-slate-200 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+          <div className="pl-6 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </div>
-          <button 
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs px-8 py-3 rounded-xl transition-all shadow-lg shadow-blue-200 active:scale-95"
-          >
-            TÌM KIẾM
-          </button>
+          <input 
+            type="text" 
+            placeholder="Nhập mã chứng khoán (VD: HPG)..." 
+            className="flex-grow px-4 py-4 bg-transparent text-slate-900 font-bold uppercase placeholder:text-slate-400 placeholder:normal-case focus:outline-none"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <div className="pr-2">
+            <button 
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs px-10 py-3 rounded-full transition-all active:scale-95"
+            >
+              TÌM KIẾM
+            </button>
+          </div>
         </form>
       </div>
 
-      {/* Detailed View if Symbol Selected */}
-      {selectedSymbol && stockStats && (
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-slate-100">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-200">
-                <span className="text-white font-black text-xl">{selectedSymbol[0]}</span>
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h4 className="text-2xl font-black uppercase tracking-tight text-slate-900">Chi tiết mã:</h4>
-                  <span className={`text-2xl font-black uppercase tracking-tight ${stockStats.changePercent > 0 ? 'text-emerald-600' : stockStats.changePercent < 0 ? 'text-rose-600' : 'text-amber-500'}`}>
-                    {selectedSymbol}
+      {/* Detailed View and Table - Only show if Symbol Selected */}
+      {selectedSymbol && stockStats ? (
+        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-4">
+                <h2 className={`text-5xl font-black tracking-tighter ${stockStats.changePercent > 0 ? 'text-emerald-600' : stockStats.changePercent < 0 ? 'text-rose-600' : 'text-amber-500'}`}>
+                  {selectedSymbol}
+                </h2>
+                <div className="flex flex-col">
+                  <span className="text-3xl font-black text-slate-900 leading-none">
+                    {(stockStats.currentPrice * 1000).toLocaleString('vi-VN')}
+                  </span>
+                  <span className={`text-lg font-bold ${stockStats.changePercent > 0 ? 'text-emerald-500' : stockStats.changePercent < 0 ? 'text-rose-500' : 'text-amber-500'}`}>
+                    {stockStats.changePercent > 0 ? '+' : ''}{stockStats.rawChangePercent}%
                   </span>
                 </div>
-                <div className="flex items-center gap-4 mt-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-slate-400 text-xs font-black uppercase tracking-widest">Giá hiện tại:</span>
-                    <span className="text-lg font-mono font-black text-slate-900">
-                      {(stockStats.currentPrice * 1000).toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 10 })} VND
-                    </span>
-                  </div>
-                  <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${stockStats.changePercent > 0 ? 'bg-emerald-50 text-emerald-600' : stockStats.changePercent < 0 ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-500'}`}>
-                    {stockStats.changePercent > 0 ? '▲' : stockStats.changePercent < 0 ? '▼' : '●'}
-                    {stockStats.rawChangePercent}%
-                  </div>
+              </div>
+              <div className="flex items-center gap-3 text-slate-400 text-[11px] font-bold uppercase tracking-widest">
+                <span>{stockStats.totalOrders} lệnh khớp</span>
+                <span>•</span>
+                <div className="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {new Date().toLocaleDateString('vi-VN')}
                 </div>
               </div>
-            </div>
-            <button 
-              onClick={() => { setSelectedSymbol(null); setSearchTerm(''); }}
-              className="text-slate-400 hover:text-slate-600 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-emerald-50/50 p-6 rounded-3xl border border-emerald-100">
-                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">Tổng Lệnh Mua</p>
-                <p className="text-3xl font-black text-emerald-700">{stockStats.buyCount}</p>
-                <p className="text-xs font-bold text-emerald-600/70 mt-1">Giá trị: {formatValue(stockStats.buyValue)}</p>
-              </div>
-              <div className="bg-rose-50/50 p-6 rounded-3xl border border-rose-100">
-                <p className="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-2">Tổng Lệnh Bán</p>
-                <p className="text-3xl font-black text-rose-700">{stockStats.sellCount}</p>
-                <p className="text-xs font-bold text-rose-600/70 mt-1">Giá trị: {formatValue(stockStats.sellValue)}</p>
-              </div>
-              <div className="col-span-2 bg-slate-50 p-6 rounded-3xl border border-slate-100 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tổng Giá Trị Giao Dịch BIG</p>
-                  <p className="text-2xl font-black text-slate-800">{formatValue(stockStats.buyValue + stockStats.sellValue)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tỷ lệ Mua/Bán</p>
-                  <p className="text-2xl font-black text-blue-600">
-                    {((stockStats.buyValue / (stockStats.buyValue + stockStats.sellValue || 1)) * 100).toFixed(2)}%
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Pie Chart */}
-            <div className="h-[280px] bg-slate-50/30 rounded-3xl border border-slate-100 p-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={stockStats.pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    <Cell fill="#10b981" />
-                    <Cell fill="#f43f5e" />
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                    formatter={(value: number, name: string, props: any) => {
-                      return [
-                        `${formatValue(value)} (${props.payload.count} lệnh)`,
-                        name
-                      ];
-                    }}
-                  />
-                  <Legend verticalAlign="bottom" height={36}/>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Top 5 Price Levels Chart */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h5 className="text-sm font-black text-slate-900 uppercase tracking-widest">Thống kê 5 bước giá giao dịch BIG cao nhất</h5>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Buy Levels */}
-              <div className="bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
-                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4">Top 5 Bước Giá Mua</p>
-                <div className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={stockStats.topBuyLevels} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                      <XAxis type="number" hide />
-                      <YAxis 
-                        dataKey="price" 
-                        type="category" 
-                        width={60} 
-                        tick={{ fontSize: 11, fontWeight: 700, fill: '#475569' }}
-                      />
-                      <Tooltip 
-                        cursor={{ fill: 'transparent' }}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                        formatter={(value: number) => [formatValue(value), 'Giá trị']}
-                      />
-                      <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
-                    </BarChart>
-                  </ResponsiveContainer>
+            <div className={`px-8 py-2.5 rounded-lg font-black uppercase tracking-widest text-sm shadow-sm ${stockStats.buyValue > stockStats.sellValue ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
+              {stockStats.buyValue > stockStats.sellValue ? 'MUA RÒNG' : 'BÁN RÒNG'}
+            </div>
+          </div>
+
+          {/* Top Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-emerald-50/30 border border-emerald-100 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+              <div className="flex items-center gap-2 text-emerald-600 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                <span className="text-[10px] font-black uppercase tracking-widest">GIÁ TRỊ MUA</span>
+              </div>
+              <p className="text-3xl font-black text-emerald-600">{formatValue(stockStats.buyValue)}</p>
+              <p className="text-xs font-bold text-slate-400 mt-1">{stockStats.buyCount} lệnh</p>
+            </div>
+
+            <div className="bg-rose-50/30 border border-rose-100 p-6 rounded-2xl flex flex-col items-center justify-center text-center">
+              <div className="flex items-center gap-2 text-rose-600 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                </svg>
+                <span className="text-[10px] font-black uppercase tracking-widest">GIÁ TRỊ BÁN</span>
+              </div>
+              <p className="text-3xl font-black text-rose-600">{formatValue(stockStats.sellValue)}</p>
+              <p className="text-xs font-bold text-slate-400 mt-1">{stockStats.sellCount} lệnh</p>
+            </div>
+
+            <div className="bg-white border border-slate-200 p-6 rounded-2xl">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">TỶ LỆ ÁP ĐẢO</span>
+                <span className="text-lg font-black text-emerald-600">{stockStats.buyRatio.toFixed(1)}%</span>
+              </div>
+              <div className="w-full h-3 bg-rose-500 rounded-full overflow-hidden flex">
+                <div 
+                  className="h-full bg-emerald-500 transition-all duration-1000" 
+                  style={{ width: `${stockStats.buyRatio}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-[9px] font-bold text-slate-400 uppercase">Mua</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase">Bán</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Donut Chart */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-1 h-4 bg-blue-600 rounded-full" />
+                <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">TỔNG QUAN MUA/BÁN</h4>
+              </div>
+              <div className="h-[280px] relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={stockStats.pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={70}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      <Cell fill="#10b981" />
+                      <Cell fill="#f43f5e" />
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                      formatter={(value: number) => [formatValue(value), 'Giá trị']}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Tổng GT</p>
+                  <p className="text-xl font-black text-slate-900">{formatValue(stockStats.buyValue + stockStats.sellValue)}</p>
                 </div>
               </div>
+              <div className="flex justify-center gap-6 mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span className="text-xs font-bold text-slate-600">Mua</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-rose-500" />
+                  <span className="text-xs font-bold text-slate-600">Bán</span>
+                </div>
+              </div>
+            </div>
 
-              {/* Sell Levels */}
-              <div className="bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
-                <p className="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-4">Top 5 Bước Giá Bán</p>
-                <div className="h-[200px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={stockStats.topSellLevels} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                      <XAxis type="number" hide />
-                      <YAxis 
-                        dataKey="price" 
-                        type="category" 
-                        width={60} 
-                        tick={{ fontSize: 11, fontWeight: 700, fill: '#475569' }}
-                      />
-                      <Tooltip 
-                        cursor={{ fill: 'transparent' }}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                        formatter={(value: number) => [formatValue(value), 'Giá trị']}
-                      />
-                      <Bar dataKey="value" fill="#f43f5e" radius={[0, 4, 4, 0]} barSize={20} />
-                    </BarChart>
-                  </ResponsiveContainer>
+            {/* Stacked Bar Chart */}
+            <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-1 h-4 bg-purple-600 rounded-full" />
+                <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">PHÂN BỐ KHỐI LƯỢNG THEO GIÁ</h4>
+              </div>
+              <div className="h-[320px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stockStats.volumeByPrice}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="price" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fontWeight: 600, fill: '#64748b' }}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fontWeight: 600, fill: '#64748b' }}
+                      tickFormatter={(value) => value >= 1000 ? `${(value/1000).toFixed(0)}k` : value}
+                    />
+                    <Tooltip 
+                      cursor={{ fill: '#f8fafc' }}
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                      formatter={(value: number) => [formatNumber(value), 'Khối lượng']}
+                    />
+                    <Bar dataKey="buyVol" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} barSize={20} />
+                    <Bar dataKey="sellVol" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={20} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex justify-center gap-6 mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span className="text-xs font-bold text-slate-600">KL Mua</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-rose-500" />
+                  <span className="text-xs font-bold text-slate-600">KL Bán</span>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Table Container */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-slate-100 bg-slate-50/30 flex items-center justify-between">
+              <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">
+                NHẬT KÝ LỆNH BIG: {selectedSymbol}
+              </h4>
+              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                {filteredData.length} Lệnh được ghi nhận
+              </div>
+            </div>
+
+            <div className="overflow-x-auto max-h-[500px] no-scrollbar">
+              <table className="w-full text-left border-collapse">
+                <thead className="sticky top-0 z-10 bg-white shadow-sm">
+                  <tr>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Cổ phiếu</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Loại</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Khối lượng</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Giá khớp</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Giá trị</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Thay đổi</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Thời gian</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {filteredData.map((item, index) => {
+                    const isBuy = item.type.toUpperCase() === 'MUA';
+                    return (
+                      <tr key={`${item.symbol}-${item.time}-${index}`} className="hover:bg-slate-50/50 transition-colors group">
+                        <td className="px-6 py-4">
+                          <span className="text-xs font-black text-slate-900">{item.symbol}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`text-[10px] font-black uppercase ${isBuy ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {item.type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className="text-xs font-mono font-medium text-slate-600">{formatNumber(item.volume)}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className="text-xs font-mono font-medium text-slate-900">{item.rawPrice}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className={`text-xs font-mono font-bold ${isBuy ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            {formatValue(item.value)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${item.changePercent > 0 ? 'bg-emerald-50 text-emerald-600' : item.changePercent < 0 ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-500'}`}>
+                            {item.changePercent > 0 ? '+' : ''}{item.rawChangePercent}%
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <span className="text-[10px] font-mono text-slate-400">{item.time}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white py-24 rounded-[2.5rem] border border-dashed border-slate-200 flex flex-col items-center justify-center text-center px-6">
+          <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <h4 className="text-xl font-black text-slate-400 uppercase tracking-widest">Vui lòng nhập mã chứng khoán</h4>
+          <p className="text-slate-400 mt-2 text-sm font-medium max-w-md">
+            Nhập mã cổ phiếu vào ô tìm kiếm phía trên để xem chi tiết các lệnh BIG (lệnh quy mô lớn) được ghi nhận trong phiên.
+          </p>
         </div>
       )}
-
-      {/* Table Container */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden ring-1 ring-slate-100">
-        <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            </div>
-            <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">
-              {selectedSymbol ? `Lệnh BIG cho mã ${selectedSymbol}` : 'Lệnh BIG intraday'}
-            </h4>
-          </div>
-          <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-slate-100">
-            {filteredData.length} Lệnh được ghi nhận
-          </div>
-        </div>
-
-        <div className="overflow-x-auto max-h-[600px] no-scrollbar">
-          <table className="w-full text-left border-collapse">
-            <thead className="sticky top-0 z-10 bg-white shadow-sm">
-              <tr>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Tên cổ phiếu</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Loại Lệnh</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Khối lượng Khớp</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Giá khớp</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Giá trị khớp</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Thay đổi</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Thời gian</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {filteredData.map((item, index) => {
-                const isBuy = item.type.toUpperCase() === 'MUA';
-                const changeColor = item.changePercent > 0 ? 'text-emerald-600' : item.changePercent < 0 ? 'text-rose-600' : 'text-amber-500';
-                const changeBg = item.changePercent > 0 ? 'bg-emerald-50' : item.changePercent < 0 ? 'bg-rose-50' : 'bg-amber-50';
-                
-                return (
-                  <tr key={`${item.symbol}-${item.time}-${index}`} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors">{item.symbol}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-xs font-black uppercase tracking-wider ${isBuy ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {item.type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className="text-sm font-mono font-medium text-slate-600">{formatNumber(item.volume)} CP</span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className="text-sm font-mono font-medium text-slate-900">
-                        {item.rawPrice}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className={`text-sm font-mono font-bold ${isBuy ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {formatValue(item.value)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold ${changeColor} ${changeBg}`}>
-                        {item.changePercent > 0 ? '+' : ''}{item.rawChangePercent}%
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className="text-xs font-mono text-slate-400">{item.time}</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        
-        {filteredData.length === 0 && (
-          <div className="py-20 text-center">
-            <p className="text-slate-400 font-medium">
-              {selectedSymbol ? `Không tìm thấy lệnh BIG cho mã ${selectedSymbol}.` : 'Chưa có dữ liệu lệnh BIG trong phiên hôm nay.'}
-            </p>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
