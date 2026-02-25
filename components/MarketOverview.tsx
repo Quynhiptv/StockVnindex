@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Line, LabelList } from 'recharts';
 
+import VN30F1MChart from './VN30F1MChart';
+
 const INDEX_SHEET_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=0';
 const MOMENTUM_SHEET_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1280701284';
 
@@ -48,50 +50,50 @@ const IndexCard: React.FC<{ data: MarketIndexData }> = ({ data }) => {
   if (changeVal > 0) {
     bgColor = 'bg-emerald-50/20'; 
     borderColor = 'border-emerald-100';
-    badgeColor = 'bg-emerald-600 text-white';
+    badgeColor = 'bg-emerald-500 text-white';
     priceColor = 'text-emerald-700';
   } else if (changeVal < 0) {
     bgColor = 'bg-rose-50/20';
     borderColor = 'border-rose-100';
-    badgeColor = 'bg-rose-600 text-white';
+    badgeColor = 'bg-rose-500 text-white';
     priceColor = 'text-rose-700';
   }
 
   const rawValue = cleanNumeric(data.value);
-  const formattedValue = Math.round(rawValue / 1000).toLocaleString('vi-VN') + ' tỷ';
+  const formattedValue = Math.round(rawValue / 1000).toLocaleString('vi-VN') + ' TỶ';
 
   return (
-    <div className={`${bgColor} border ${borderColor} rounded-[2rem] p-5 sm:p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500`}>
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter">{data.name}</h3>
-        <div className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase ${badgeColor}`}>
+    <div className={`${bgColor} border-2 ${borderColor} rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden`}>
+      <div className="flex justify-between items-start mb-6">
+        <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter">{data.name}</h3>
+        <div className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase shadow-sm ${badgeColor}`}>
           {ensurePercent(data.changePercent)}
         </div>
       </div>
 
-      <div className="mb-4">
-        <div className={`text-3xl sm:text-4xl font-black ${priceColor} tracking-tighter leading-none tabular-nums`}>{data.price}</div>
-        <div className="text-slate-500 text-[9px] font-black mt-3 bg-white inline-block px-3 py-1 rounded-full uppercase border border-slate-100 shadow-sm">
+      <div className="mb-6">
+        <div className={`text-4xl sm:text-5xl font-black ${priceColor} tracking-tighter leading-none tabular-nums`}>{data.price}</div>
+        <div className="text-slate-500 text-[10px] font-black mt-4 bg-slate-100/80 inline-block px-4 py-1.5 rounded-full uppercase border border-slate-200 shadow-sm">
           GTGD: {formattedValue}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-3 gap-y-4 pt-5 border-t border-slate-100/50">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-6 pt-6 border-t border-slate-200/50">
         <div>
-          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">RSI (14)</p>
-          <p className="text-base font-black text-slate-800 tabular-nums">{data.rsi}</p>
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">RSI (14)</p>
+          <p className="text-lg font-black text-slate-800 tabular-nums">{data.rsi}</p>
         </div>
         <div>
-          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">CÁCH MA20</p>
-          <p className="text-base font-black text-slate-800 tabular-nums">{ensurePercent(data.ma20)}</p>
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">CÁCH MA20</p>
+          <p className="text-lg font-black text-slate-800 tabular-nums">{ensurePercent(data.ma20)}</p>
         </div>
         <div>
-          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">VOL / QUA</p>
-          <p className="text-base font-black text-slate-800 tabular-nums">{ensurePercent(data.volYesterday)}</p>
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">VOL / QUA</p>
+          <p className="text-lg font-black text-slate-800 tabular-nums">{ensurePercent(data.volYesterday)}</p>
         </div>
         <div>
-          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">VOL / TB20</p>
-          <p className="text-base font-black text-slate-800 tabular-nums">{ensurePercent(data.volAvg20)}</p>
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">VOL / TB20</p>
+          <p className="text-lg font-black text-slate-800 tabular-nums">{ensurePercent(data.volAvg20)}</p>
         </div>
       </div>
     </div>
@@ -302,24 +304,26 @@ const MarketOverview: React.FC = () => {
 
   return (
     <div className="space-y-12 md:space-y-20 animate-fadeIn pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between bg-white px-8 py-8 rounded-[2.5rem] border border-slate-200 shadow-sm gap-6">
-        <div className="flex items-center gap-6">
-          <div className="bg-blue-600 p-5 rounded-[1.5rem] shadow-xl shadow-blue-100 shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+      <div className="bg-slate-200 p-2 rounded-[2.5rem] border border-slate-300 shadow-inner">
+        <div className="flex flex-col md:flex-row md:items-center justify-between bg-white px-8 py-6 rounded-[2.2rem] border border-slate-200 shadow-sm gap-6">
+          <div className="flex items-center gap-6">
+            <div className="bg-blue-600 p-4 rounded-2xl shadow-xl shadow-blue-100 shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter leading-none uppercase">CHỈ SỐ THỊ TRƯỜNG</h2>
+              <p className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-[0.25em]">DÒNG TIỀN & ĐỘNG LƯỢNG THỰC THỜI</p>
+            </div>
+          </div>
+          <button onClick={fetchData} disabled={loading} className="group flex items-center justify-center gap-3 px-8 py-3.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-2xl shadow-sm transition-all active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 text-blue-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-          </div>
-          <div>
-            <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter leading-none uppercase">CHỈ SỐ THỊ TRƯỜNG</h2>
-            <p className="text-[12px] font-black text-slate-400 mt-4 uppercase tracking-[0.25em]">DÒNG TIỀN & ĐỘNG LƯỢNG THỰC THỜI</p>
-          </div>
+            <span className="text-[12px] font-black text-slate-800 uppercase tracking-widest">LÀM MỚI</span>
+          </button>
         </div>
-        <button onClick={fetchData} disabled={loading} className="group flex items-center justify-center gap-4 px-10 py-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-[1.8rem] shadow-sm transition-all active:scale-95">
-          <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 text-blue-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          <span className="text-[14px] font-black text-slate-800 uppercase tracking-widest">LÀM MỚI</span>
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
@@ -327,6 +331,7 @@ const MarketOverview: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-16 md:gap-24">
+        <VN30F1MChart />
         <MomentumChart title="ĐỘNG LƯỢNG VN100" data={momentumData.vn100} />
         <MomentumChart title="ĐỘNG LƯỢNG VN30" data={momentumData.vn30} />
       </div>

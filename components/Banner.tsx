@@ -26,7 +26,7 @@ const Banner: React.FC = () => {
             </div>
             <h1 className="text-4xl md:text-7xl lg:text-8xl font-black text-white leading-[1.05] drop-shadow-2xl uppercase tracking-tighter">
               Thống kê thị trường <br className="hidden md:block" /> 
-              <span className="inline-block border-[6px] border-blue-500 px-6 py-2 mt-4">Chứng khoán</span> VN
+              Chứng khoán VN
             </h1>
             <p className="mt-6 text-blue-100/90 text-lg md:text-xl font-bold flex items-center justify-center md:justify-start gap-3">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
