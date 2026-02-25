@@ -79,40 +79,38 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({ activeTab, onTabChange })
   }, [activeTab]);
 
   return (
-    <div className="w-full bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm transition-all duration-300">
+    <div className="w-full bg-slate-50 sticky top-0 z-40 py-4 transition-all duration-300">
       <div className="container mx-auto px-2 sm:px-4">
-        {/* Container cho các tab: Cuộn trên Mobile, Tự rải đều/xuống hàng trên Tablet+ */}
-        <div 
-          ref={scrollRef}
-          className="flex md:flex-wrap items-center py-3 md:py-4 gap-2 overflow-x-auto md:overflow-visible no-scrollbar snap-x"
-        >
-          {Object.values(MarketTab).map((tab) => (
-            <button
-              key={tab}
-              data-tab={tab}
-              onClick={() => onTabChange(tab)}
-              className={`
-                flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all duration-300 border snap-center
-                ${activeTab === tab
-                  ? 'bg-blue-600 border-blue-600 text-white font-bold shadow-lg shadow-blue-200 ring-2 ring-blue-100'
-                  : 'bg-white border-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-200 shadow-sm'
-                }
-              `}
-            >
-              <span className={`shrink-0 transition-transform duration-300 ${activeTab === tab ? 'scale-110' : 'opacity-70'}`}>
-                {tabIcons[tab]}
-              </span>
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-tight whitespace-nowrap">
-                {tab}
-              </span>
-            </button>
-          ))}
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-2">
+          {/* Container cho các tab: Cuộn trên Mobile, Tự rải đều/xuống hàng trên Tablet+ */}
+          <div 
+            ref={scrollRef}
+            className="flex md:flex-wrap items-center gap-2 overflow-x-auto md:overflow-visible no-scrollbar snap-x"
+          >
+            {Object.values(MarketTab).map((tab) => (
+              <button
+                key={tab}
+                data-tab={tab}
+                onClick={() => onTabChange(tab)}
+                className={`
+                  flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all duration-300 border snap-center
+                  ${activeTab === tab
+                    ? 'bg-blue-600 border-blue-600 text-white font-black shadow-lg shadow-blue-200 ring-2 ring-blue-100'
+                    : 'bg-slate-50 border-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-100 hover:border-slate-200 font-bold'
+                  }
+                `}
+              >
+                <span className={`shrink-0 transition-transform duration-300 ${activeTab === tab ? 'scale-110' : 'opacity-70'}`}>
+                  {tabIcons[tab]}
+                </span>
+                <span className="text-[10px] sm:text-[11px] uppercase tracking-tight whitespace-nowrap">
+                  {tab}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      
-      {/* Hiệu ứng mờ chỉ hiển thị trên mobile để báo hiệu còn tab phía sau */}
-      <div className="md:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none"></div>
-      <div className="md:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/80 to-transparent pointer-events-none"></div>
     </div>
   );
 };

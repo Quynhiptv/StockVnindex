@@ -218,44 +218,37 @@ const BigOrderFilter: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
-      {/* Header Info */}
-      <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Cập nhật dữ liệu Lệnh BIG trong phiên</h3>
-          <p className="text-slate-500 text-sm font-medium mt-1 italic">Dữ liệu được cập nhật intraday</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-8 bg-blue-600 rounded-full" />
+          <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tight">LỌC LỆNH BIG</h3>
         </div>
-        <div className="flex items-center gap-3 px-5 py-2.5 bg-slate-50 rounded-2xl border border-slate-100">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Phân tích bởi</p>
-            <p className="text-sm font-black text-slate-800 uppercase mt-1">Team Đoàn Quỳnh - 0904301086</p>
-          </div>
+        
+        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-200 rounded-full">
+          <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+          <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">SÀN HOSE: ĐANG NGHỈ GIAO DỊCH</span>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="max-w-3xl mx-auto w-full">
-        <form onSubmit={handleSearch} className="flex items-center gap-0 bg-white rounded-full border border-slate-200 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+      <div className="w-full">
+        <form onSubmit={handleSearch} className="flex items-center gap-0 bg-slate-200 rounded-full border border-slate-300 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-blue-100 transition-all">
           <div className="pl-6 flex items-center pointer-events-none">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
           <input 
             type="text" 
             placeholder="Nhập mã chứng khoán (VD: HPG)..." 
-            className="flex-grow px-4 py-4 bg-transparent text-slate-900 font-bold uppercase placeholder:text-slate-400 placeholder:normal-case focus:outline-none"
+            className="flex-grow px-4 py-5 bg-transparent text-slate-900 font-black uppercase placeholder:text-slate-500 placeholder:normal-case focus:outline-none text-lg"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="pr-2">
             <button 
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs px-10 py-3 rounded-full transition-all active:scale-95"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider text-sm px-12 py-4 rounded-full transition-all active:scale-95"
             >
               TÌM KIẾM
             </button>
@@ -274,7 +267,7 @@ const BigOrderFilter: React.FC = () => {
                   {selectedSymbol}
                 </h2>
                 <div className="flex flex-col">
-                  <span className="text-3xl font-black text-slate-900 leading-none">
+                  <span className={`text-3xl font-black leading-none ${stockStats.changePercent > 0 ? 'text-emerald-600' : stockStats.changePercent < 0 ? 'text-rose-600' : 'text-amber-500'}`}>
                     {(stockStats.currentPrice * 1000).toLocaleString('vi-VN')}
                   </span>
                   <span className={`text-lg font-bold ${stockStats.changePercent > 0 ? 'text-emerald-500' : stockStats.changePercent < 0 ? 'text-rose-500' : 'text-amber-500'}`}>
@@ -443,7 +436,7 @@ const BigOrderFilter: React.FC = () => {
               </div>
             </div>
 
-            <div className="overflow-x-auto max-h-[500px] no-scrollbar">
+            <div className="overflow-x-auto max-h-[500px] custom-scrollbar">
               <table className="w-full text-left border-collapse">
                 <thead className="sticky top-0 z-10 bg-white shadow-sm">
                   <tr>
