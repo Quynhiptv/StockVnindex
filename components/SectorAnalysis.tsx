@@ -6,8 +6,6 @@ import Markdown from 'react-markdown';
 
 const SECTOR_DATA_URL = 'https://docs.google.com/spreadsheets/d/1z5ZL72hbhzB6G2Tzh6s-E1BIbqmuqct0EA0Mdfuf9VY/export?format=csv&gid=1485532794';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 interface SectorData {
   name: string;
   volVsPrev: number;
@@ -116,40 +114,43 @@ const SectorAnalysis: React.FC = () => {
     setAiLoading(true);
     setAiAnalysis(null);
 
-    const sorted = [...data].sort((a, b) => b.changeToday - a.changeToday);
-    const top3 = sorted.slice(0, 3);
-    const bottom3 = sorted.slice(-3).reverse();
-
-    const prompt = `
-      Dựa trên dữ liệu thị trường chứng khoán Việt Nam ngày ${updateDate}, hãy đưa ra nhận định chuyên sâu và chuyên nghiệp về 3 nhóm ngành tăng mạnh nhất và 3 nhóm ngành giảm mạnh nhất.
-      
-      Dữ liệu 3 nhóm ngành TĂNG mạnh nhất:
-      ${top3.map(s => `- ${s.name}: Biến động ${s.changeToday}%, KL/TB20P: ${s.volVsAvg20}%, Sức mạnh: ${s.strengthIndex} (Biến động: ${s.strengthChange}), Cách MA20: ${s.vsMA20}%, RSI: ${s.rsi}, ADX: ${s.adx}`).join('\n')}
-      
-      Dữ liệu 3 nhóm ngành GIẢM mạnh nhất:
-      ${bottom3.map(s => `- ${s.name}: Biến động ${s.changeToday}%, KL/TB20P: ${s.volVsAvg20}%, Sức mạnh: ${s.strengthIndex} (Biến động: ${s.strengthChange}), Cách MA20: ${s.vsMA20}%, RSI: ${s.rsi}, ADX: ${s.adx}`).join('\n')}
-      
-      Yêu cầu phân tích:
-      1. Đánh giá XU HƯỚNG: Sử dụng ADX (độ mạnh xu hướng) và RSI (quá mua/quá bán) kết hợp với vị thế so với MA20.
-      2. Phân tích DÒNG TIỀN: Tương quan giữa giá và khối lượng (KL/TB20P).
-      3. Đánh giá SỨC MẠNH: Dựa trên Chỉ số sức mạnh và Biến động bậc.
-      4. Đưa ra CHIẾN LƯỢC: Lời khuyên cụ thể (Mua, Nắm giữ, Chốt lời, hoặc Cắt lỗ) cho từng nhóm.
-      
-      Trình bày:
-      - Sử dụng Markdown chuyên nghiệp.
-      - Chia rõ các phần: "Tổng quan dòng tiền", "Phân tích chi tiết Nhóm Tăng", "Phân tích chi tiết Nhóm Giảm", "Kết luận & Hành động".
-      - Ngôn ngữ: Tiếng Việt, phong cách chuyên gia phân tích cao cấp.
-    `;
-
     try {
-      const response = await ai.models.generateContent({
+      const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+      const sorted = [...data].sort((a, b) => b.changeToday - a.changeToday);
+      const top3 = sorted.slice(0, 3);
+      const bottom3 = sorted.slice(-3).reverse();
+
+      const prompt = `
+        Dựa trên dữ liệu thị trường chứng khoán Việt Nam ngày ${updateDate}, hãy đưa ra nhận định chuyên sâu và chuyên nghiệp về 3 nhóm ngành tăng mạnh nhất và 3 nhóm ngành giảm mạnh nhất.
+        
+        Dữ liệu 3 nhóm ngành TĂNG mạnh nhất:
+        ${top3.map(s => `- ${s.name}: Biến động ${s.changeToday}%, KL/TB20P: ${s.volVsAvg20}%, Sức mạnh: ${s.strengthIndex} (Biến động: ${s.strengthChange}), Cách MA20: ${s.vsMA20}%, RSI: ${s.rsi}, ADX: ${s.adx}`).join('\n')}
+        
+        Dữ liệu 3 nhóm ngành GIẢM mạnh nhất:
+        ${bottom3.map(s => `- ${s.name}: Biến động ${s.changeToday}%, KL/TB20P: ${s.volVsAvg20}%, Sức mạnh: ${s.strengthIndex} (Biến động: ${s.strengthChange}), Cách MA20: ${s.vsMA20}%, RSI: ${s.rsi}, ADX: ${s.adx}`).join('\n')}
+        
+        Yêu cầu phân tích:
+        1. Đánh giá XU HƯỚNG: Sử dụng ADX (độ mạnh xu hướng) và RSI (quá mua/quá bán) kết hợp với vị thế so với MA20.
+        2. Phân tích DÒNG TIỀN: Tương quan giữa giá và khối lượng (KL/TB20P).
+        3. Đánh giá SỨC MẠNH: Dựa trên Chỉ số sức mạnh và Biến động bậc.
+        4. Đưa ra CHIẾN LƯỢC: Lời khuyên cụ thể (Mua, Nắm giữ, Chốt lời, hoặc Cắt lỗ) cho từng nhóm.
+        
+        Trình bày:
+        - Sử dụng Markdown chuyên nghiệp.
+        - Chia rõ các phần: "Tổng quan dòng tiền", "Phân tích chi tiết Nhóm Tăng", "Phân tích chi tiết Nhóm Giảm", "Kết luận & Hành động".
+        - Ngôn ngữ: Tiếng Việt, phong cách chuyên gia phân tích cao cấp.
+      `;
+
+      const response = await genAI.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: prompt,
       });
+      
       setAiAnalysis(response.text || "Không có phản hồi từ AI.");
-    } catch (error) {
+    } catch (error: any) {
       console.error("AI Analysis Error:", error);
-      setAiAnalysis("Đã xảy ra lỗi khi kết nối với AI. Vui lòng thử lại sau.");
+      setAiAnalysis(`Đã xảy ra lỗi khi kết nối với AI: ${error.message || 'Lỗi không xác định'}. Vui lòng thử lại sau.`);
     } finally {
       setAiLoading(false);
     }
