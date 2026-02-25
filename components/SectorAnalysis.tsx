@@ -1,8 +1,6 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from 'recharts';
-import { GoogleGenAI } from "@google/genai";
-import Markdown from 'react-markdown';
 
 const SECTOR_DATA_URL = 'https://docs.google.com/spreadsheets/d/1z5ZL72hbhzB6G2Tzh6s-E1BIbqmuqct0EA0Mdfuf9VY/export?format=csv&gid=1485532794';
 
@@ -19,9 +17,11 @@ interface SectorData {
   adx: number;         // Cột T
 }
 
-const cleanNumber = (val: string): number => {
-  if (!val || val === '-' || val === '' || val === '#N/A' || val === '#VALUE!') return 0;
-  let s = val.trim().replace('%', '');
+const cleanNumber = (val: any): number => {
+  if (val === undefined || val === null) return 0;
+  const sVal = String(val).trim();
+  if (!sVal || sVal === '-' || sVal === '' || sVal === '#N/A' || sVal === '#VALUE!') return 0;
+  let s = sVal.replace('%', '');
   
   const lastComma = s.lastIndexOf(',');
   const lastDot = s.lastIndexOf('.');
@@ -50,28 +50,35 @@ const SectorAnalysis: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const parseCSV = (csv: string) => {
-    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      for (let char of row) {
-        if (char === '"') inQuotes = !inQuotes;
-        else if (char === ',' && !inQuotes) {
-          result.push(current.trim());
-          current = '';
-        } else {
-          current += char;
+    try {
+      return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let char of row) {
+          if (char === '"') inQuotes = !inQuotes;
+          else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
         }
-      }
-      result.push(current.trim());
-      return result;
-    });
+        result.push(current.trim());
+        return result;
+      });
+    } catch (e) {
+      console.error("CSV Parse Error", e);
+      return [];
+    }
   };
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const timestamp = new Date().getTime();
       const response = await fetch(`${SECTOR_DATA_URL}&t=${timestamp}`, { cache: 'no-store' });
 
@@ -79,6 +86,10 @@ const SectorAnalysis: React.FC = () => {
 
       const csv = await response.text();
       const rows = parseCSV(csv);
+
+      if (rows.length === 0) {
+        throw new Error('Dữ liệu trống hoặc không đúng định dạng');
+      }
 
       // Dữ liệu ngày: Hiển thị ô B2 (hàng 2, cột 2 -> index [1][1])
       if (rows[1] && rows[1][1]) {
@@ -89,7 +100,7 @@ const SectorAnalysis: React.FC = () => {
         .slice(1) // Bỏ qua hàng tiêu đề
         .filter(row => row[0] && row[0] !== 'Nhóm ngành' && row[0] !== '')
         .map(row => ({
-          name: row[0],
+          name: row[0] || 'N/A',
           volVsPrev: cleanNumber(row[4]), // Cột E
           volVsAvg20: cleanNumber(row[6]), // Cột G
           changeToday: cleanNumber(row[7]), // Cột H
@@ -102,8 +113,10 @@ const SectorAnalysis: React.FC = () => {
         }));
 
       setData(parsedData);
-    } catch (err) {
+      setError(null);
+    } catch (err: any) {
       console.error('Lỗi SectorAnalysis:', err);
+      setError(err.message || 'Đã xảy ra lỗi không xác định');
     } finally {
       setLoading(false);
     }
@@ -115,7 +128,8 @@ const SectorAnalysis: React.FC = () => {
     setAiAnalysis(null);
 
     try {
-      const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const { GoogleGenAI } = await import("@google/genai");
+      const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
       const sorted = [...data].sort((a, b) => b.changeToday - a.changeToday);
       const top3 = sorted.slice(0, 3);
@@ -137,7 +151,6 @@ const SectorAnalysis: React.FC = () => {
         4. Đưa ra CHIẾN LƯỢC: Lời khuyên cụ thể (Mua, Nắm giữ, Chốt lời, hoặc Cắt lỗ) cho từng nhóm.
         
         Trình bày:
-        - Sử dụng Markdown chuyên nghiệp.
         - Chia rõ các phần: "Tổng quan dòng tiền", "Phân tích chi tiết Nhóm Tăng", "Phân tích chi tiết Nhóm Giảm", "Kết luận & Hành động".
         - Ngôn ngữ: Tiếng Việt, phong cách chuyên gia phân tích cao cấp.
       `;
@@ -158,7 +171,7 @@ const SectorAnalysis: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 15000); // Cập nhật mỗi 15s
+    const interval = setInterval(fetchData, 30000); // 30s
     return () => clearInterval(interval);
   }, []);
 
@@ -168,15 +181,35 @@ const SectorAnalysis: React.FC = () => {
 
   if (loading && data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-40">
+      <div className="flex flex-col items-center justify-center py-40 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm">
         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
         <p className="text-slate-500 font-black uppercase tracking-widest text-xs">Đang tải dữ liệu nhóm ngành...</p>
       </div>
     );
   }
 
+  if (error && data.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40 bg-white rounded-[2.5rem] border border-rose-100 shadow-sm">
+        <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Lỗi tải dữ liệu</h3>
+        <p className="text-slate-500 text-sm font-medium mb-8">{error}</p>
+        <button 
+          onClick={fetchData}
+          className="px-8 py-3 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+        >
+          Thử lại ngay
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8 animate-fadeIn pb-12">
+    <div className="space-y-8 pb-12">
       {/* Header Info Section */}
       <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
@@ -250,8 +283,8 @@ const SectorAnalysis: React.FC = () => {
               </div>
             </div>
 
-            <div className="prose prose-invert max-w-none prose-headings:text-white prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-p:text-slate-300 prose-p:leading-relaxed prose-strong:text-blue-400 prose-li:text-slate-300">
-              <Markdown>{aiAnalysis}</Markdown>
+            <div className="text-slate-300 font-medium leading-relaxed whitespace-pre-wrap">
+              {aiAnalysis}
             </div>
             
             <div className="mt-10 pt-6 border-t border-white/10 flex items-center justify-between">

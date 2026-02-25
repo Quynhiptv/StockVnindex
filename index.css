@@ -31,4 +31,12 @@
   
   .animate-blink-yellow { animation: blink-yellow 1.5s infinite; }
   .animate-blink-green { animation: blink-green 1.5s infinite; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
 }
