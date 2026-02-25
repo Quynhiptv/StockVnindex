@@ -128,8 +128,13 @@ const SectorAnalysis: React.FC = () => {
     setAiAnalysis(null);
 
     try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error('Thiếu GEMINI_API_KEY. Nếu bạn đang chạy trên Vercel, hãy thêm key này vào Environment Variables trong Project Settings.');
+      }
+
       const { GoogleGenAI } = await import("@google/genai");
-      const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+      const genAI = new GoogleGenAI({ apiKey });
 
       const sorted = [...data].sort((a, b) => b.changeToday - a.changeToday);
       const top3 = sorted.slice(0, 3);
