@@ -61,37 +61,37 @@ const IndexCard: React.FC<{ data: MarketIndexData }> = ({ data }) => {
   const formattedValue = Math.round(rawValue / 1000).toLocaleString('vi-VN') + ' tỷ';
 
   return (
-    <div className={`${bgColor} border ${borderColor} rounded-[2.5rem] p-6 sm:p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500`}>
-      <div className="flex justify-between items-start mb-6">
-        <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter">{data.name}</h3>
-        <div className={`px-4 py-1.5 rounded-xl text-[12px] font-black uppercase ${badgeColor}`}>
+    <div className={`${bgColor} border ${borderColor} rounded-[2rem] p-5 sm:p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500`}>
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-lg font-black text-slate-800 uppercase tracking-tighter">{data.name}</h3>
+        <div className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase ${badgeColor}`}>
           {ensurePercent(data.changePercent)}
         </div>
       </div>
 
-      <div className="mb-8">
-        <div className={`text-4xl sm:text-5xl font-black ${priceColor} tracking-tighter leading-none tabular-nums`}>{data.price}</div>
-        <div className="text-slate-500 text-[10px] font-black mt-5 bg-white inline-block px-4 py-1.5 rounded-full uppercase border border-slate-100 shadow-sm">
+      <div className="mb-4">
+        <div className={`text-3xl sm:text-4xl font-black ${priceColor} tracking-tighter leading-none tabular-nums`}>{data.price}</div>
+        <div className="text-slate-500 text-[9px] font-black mt-3 bg-white inline-block px-3 py-1 rounded-full uppercase border border-slate-100 shadow-sm">
           GTGD: {formattedValue}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-8 pt-8 border-t border-slate-100/50">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-4 pt-5 border-t border-slate-100/50">
         <div>
-          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">RSI (14)</p>
-          <p className="text-lg font-black text-slate-800 tabular-nums">{data.rsi}</p>
+          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">RSI (14)</p>
+          <p className="text-base font-black text-slate-800 tabular-nums">{data.rsi}</p>
         </div>
         <div>
-          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">CÁCH MA20</p>
-          <p className="text-lg font-black text-slate-800 tabular-nums">{ensurePercent(data.ma20)}</p>
+          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">CÁCH MA20</p>
+          <p className="text-base font-black text-slate-800 tabular-nums">{ensurePercent(data.ma20)}</p>
         </div>
         <div>
-          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">VOL / QUA</p>
-          <p className="text-lg font-black text-slate-800 tabular-nums">{ensurePercent(data.volYesterday)}</p>
+          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">VOL / QUA</p>
+          <p className="text-base font-black text-slate-800 tabular-nums">{ensurePercent(data.volYesterday)}</p>
         </div>
         <div>
-          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">VOL / TB20</p>
-          <p className="text-lg font-black text-slate-800 tabular-nums">{ensurePercent(data.volAvg20)}</p>
+          <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-0.5">VOL / TB20</p>
+          <p className="text-base font-black text-slate-800 tabular-nums">{ensurePercent(data.volAvg20)}</p>
         </div>
       </div>
     </div>

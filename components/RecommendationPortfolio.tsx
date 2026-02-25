@@ -20,6 +20,7 @@ const RecommendationPortfolio: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [selectedGroup, setSelectedGroup] = useState<string>('Tất cả');
 
   const parseDate = (dateStr: string) => {
     try {
@@ -128,17 +129,40 @@ const RecommendationPortfolio: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const groups = useMemo(() => {
+    const uniqueGroups = Array.from(new Set(recommendations.map(r => r.group)));
+    return ['Tất cả', ...uniqueGroups.sort()];
+  }, [recommendations]);
+
   const filteredRecommendations = useMemo(() => {
-    if (!startDate && !endDate) return recommendations;
+    let filtered = recommendations;
 
-    const start = startDate ? new Date(startDate).getTime() : 0;
-    const end = endDate ? new Date(endDate).getTime() : Infinity;
+    // Filter by Group
+    if (selectedGroup !== 'Tất cả') {
+      filtered = filtered.filter(item => item.group === selectedGroup);
+    }
 
-    return recommendations.filter(item => {
-      const itemDate = parseDate(item.date);
-      return itemDate >= start && itemDate <= end;
-    });
-  }, [recommendations, startDate, endDate]);
+    // Filter by Date Range if provided
+    if (startDate || endDate) {
+      const start = startDate ? new Date(startDate).getTime() : 0;
+      const end = endDate ? new Date(endDate).getTime() : Infinity;
+
+      filtered = filtered.filter(item => {
+        const itemDate = parseDate(item.date);
+        return itemDate >= start && itemDate <= end;
+      });
+    } else {
+      // Default: Only show recommendations within the last 10 trading days (T+0 to T+10)
+      filtered = filtered.filter(item => {
+        const tStatus = calculateTPrefix(item.date);
+        if (tStatus === 'T+?') return false;
+        const tValue = parseInt(tStatus.replace('T+', ''));
+        return tValue >= 0 && tValue <= 10;
+      });
+    }
+
+    return filtered;
+  }, [recommendations, startDate, endDate, selectedGroup]);
 
   if (loading) {
     return (
@@ -157,15 +181,29 @@ const RecommendationPortfolio: React.FC = () => {
           <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Cập nhật danh sách các mã cổ phiếu của 1 số nhóm</h3>
           <p className="text-slate-500 text-sm font-medium mt-1 italic">Đây là thông tin mang giá trị tham khảo</p>
         </div>
-        <div className="flex items-center gap-3 px-5 py-2.5 bg-slate-50 rounded-2xl border border-slate-100">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 shadow-sm">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lọc Nhóm:</span>
+            <select 
+              value={selectedGroup}
+              onChange={(e) => setSelectedGroup(e.target.value)}
+              className="text-sm font-black text-blue-600 outline-none bg-transparent cursor-pointer uppercase tracking-tight"
+            >
+              {groups.map(group => (
+                <option key={group} value={group}>{group}</option>
+              ))}
+            </select>
           </div>
-          <div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Thực hiện bởi</p>
-            <p className="text-sm font-black text-slate-800 uppercase mt-1">ĐOÀN QUỲNH TEAM</p>
+          <div className="flex items-center gap-3 px-5 py-2.5 bg-slate-50 rounded-2xl border border-slate-100">
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Thực hiện bởi</p>
+              <p className="text-sm font-black text-slate-800 uppercase mt-1">ĐOÀN QUỲNH TEAM</p>
+            </div>
           </div>
         </div>
       </div>
