@@ -4,66 +4,74 @@ import Clock from './Clock';
 
 const Banner: React.FC = () => {
   return (
-    <div className="relative w-full h-auto min-h-[20rem] md:h-[28rem] bg-[#004d7a] overflow-hidden py-12 md:py-0">
+    <div className="relative w-full h-auto min-h-[24rem] md:h-[32rem] bg-gradient-to-br from-[#003d60] via-[#004d7a] to-[#002d4a] overflow-hidden py-12 md:py-0 flex items-center">
       {/* Background patterns */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
         <div className="grid grid-cols-12 h-full">
           {Array.from({ length: 48 }).map((_, i) => (
-            <div key={i} className="border-[0.5px] border-white/10"></div>
+            <div key={i} className="border-[0.5px] border-white/5"></div>
           ))}
         </div>
       </div>
 
-      <div className="container mx-auto h-full px-4 md:px-8 flex flex-col justify-center relative z-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-10">
-          <div className="max-w-3xl text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[10px] md:text-xs font-black uppercase tracking-widest mb-6">
-              <span className="relative flex h-2 w-2">
+      {/* Animated Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/20 blur-[120px] rounded-full animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+
+      <div className="container mx-auto px-4 md:px-8 relative z-10">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-12">
+          <div className="max-w-4xl text-center lg:text-left">
+            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-emerald-400 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-8 shadow-xl">
+              <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
               </span>
               Dữ liệu thời gian thực
             </div>
-            <h1 className="text-4xl md:text-7xl lg:text-8xl font-black text-white leading-[1.05] drop-shadow-2xl uppercase tracking-tighter">
-              Thống kê thị trường <br className="hidden md:block" /> 
+            
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-[0.95] drop-shadow-2xl uppercase tracking-tighter mb-4">
+              Thống kê <br className="hidden md:block" />
+              thị trường <br className="hidden md:block" /> 
               Chứng khoán VN
             </h1>
-            <p className="mt-6 text-blue-100/90 text-lg md:text-xl font-bold flex items-center justify-center md:justify-start gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              Dòng tiền & Tín hiệu chuyên sâu
-            </p>
+            
+            <div className="flex flex-col md:flex-row items-center lg:items-start gap-4 mt-8">
+              <div className="h-px w-12 bg-blue-400/50 hidden md:block mt-4"></div>
+              <p className="text-blue-200/80 text-lg md:text-2xl font-medium italic tracking-tight">
+                Thống kê dòng tiền và phân tích chuyên sâu
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-4 items-center md:items-end">
-             <div className="flex flex-col gap-4">
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex items-center gap-4 min-w-[240px] shadow-2xl">
-                  <div className="bg-emerald-500/20 p-3 rounded-xl border border-emerald-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+          <div className="flex flex-col gap-6 items-center lg:items-end shrink-0">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 w-full sm:w-auto">
+                <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-5 flex items-center gap-5 min-w-[280px] shadow-2xl hover:bg-white/10 transition-all duration-500 group">
+                  <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 p-4 rounded-2xl border border-emerald-500/30 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   </div>
                   <div className="text-left">
-                    <p className="text-[10px] text-white/50 font-black uppercase tracking-widest">Team Vận Hành</p>
-                    <p className="text-white text-sm font-black">Đoàn Quỳnh Team</p>
+                    <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] mb-1">Team Vận Hành</p>
+                    <p className="text-white text-lg font-black tracking-tight">Đoàn Quỳnh Team</p>
                   </div>
                 </div>
 
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex items-center gap-4 min-w-[240px] shadow-2xl">
-                  <div className="bg-blue-500/20 p-3 rounded-xl border border-blue-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-5 flex items-center gap-5 min-w-[280px] shadow-2xl hover:bg-white/10 transition-all duration-500 group">
+                  <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 p-4 rounded-2xl border border-blue-500/30 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                     </svg>
                   </div>
                   <div className="text-left">
-                    <p className="text-[10px] text-white/50 font-black uppercase tracking-widest">Hotline 24/7</p>
-                    <p className="text-white text-sm font-black tracking-tighter">0904.301.086</p>
+                    <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] mb-1">Hotline 24/7</p>
+                    <p className="text-white text-lg font-black tracking-tighter">0904.301.086</p>
                   </div>
                 </div>
              </div>
 
-             <div className="mt-4 bg-black/20 backdrop-blur-xl border border-white/5 rounded-2xl px-6 py-3 flex items-center gap-4 shadow-2xl">
+             <div className="bg-black/30 backdrop-blur-3xl border border-white/10 rounded-[2rem] px-8 py-4 flex items-center gap-5 shadow-2xl w-full sm:w-auto justify-center">
                 <Clock />
              </div>
           </div>
