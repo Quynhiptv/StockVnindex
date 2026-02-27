@@ -10,10 +10,12 @@ interface PortfolioItem {
   symbol: string;
   recDate: string;
   recPrice: number;
+  sellPrice: number;
   note: string;
   marketPrice: number;
   changePercent: number;
   profitPercent: number;
+  sellProfitPercent: number;
   holdingSessions: string;
 }
 
@@ -158,6 +160,7 @@ const SystemSettings: React.FC = () => {
           const symbol = row[0].trim();
           const liveData = priceMap.get(symbol) || { price: 0, change: 0 };
           const recPrice = cleanNumber(row[2]);
+          const sellPrice = cleanNumber(row[4]); // Column E
           const marketPrice = liveData.price;
           
           let profitPercent = 0;
@@ -165,14 +168,21 @@ const SystemSettings: React.FC = () => {
             profitPercent = ((marketPrice - recPrice) / recPrice) * 100;
           }
 
+          let sellProfitPercent = 0;
+          if (recPrice > 0 && sellPrice > 0) {
+            sellProfitPercent = ((sellPrice - recPrice) / recPrice) * 100;
+          }
+
           return {
             symbol,
             recDate: row[1],
             recPrice,
+            sellPrice,
             note: row[3],
             marketPrice,
             changePercent: liveData.change,
             profitPercent,
+            sellProfitPercent,
             holdingSessions: getBusinessDaysCount(row[1])
           };
         })
@@ -333,6 +343,7 @@ const SystemSettings: React.FC = () => {
                 <th className="px-6 py-5">Giá thị trường</th>
                 <th className="px-6 py-5">% thay đổi trong phiên</th>
                 <th className="px-6 py-5">Lãi lỗ tạm tính</th>
+                <th className="px-6 py-5">Giá bán</th>
                 <th className="px-6 py-5">Ghi chú</th>
               </tr>
             </thead>
@@ -353,13 +364,24 @@ const SystemSettings: React.FC = () => {
                     <td className={`px-6 py-5 font-black ${profitColor}`}>
                       {item.profitPercent > 0 ? '+' : ''}{item.profitPercent.toFixed(2)}%
                     </td>
-                    <td className="px-6 py-5 text-slate-500 font-medium max-w-xs truncate">{item.note}</td>
+                    <td className="px-6 py-5 font-bold text-slate-900">
+                      {item.sellPrice > 0 ? item.sellPrice.toLocaleString('vi-VN') : '-'}
+                    </td>
+                    <td className="px-6 py-5 text-slate-500 font-medium max-w-xs truncate">
+                      {item.sellPrice > 0 ? (
+                        <span className={`font-black ${item.sellProfitPercent >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {item.sellProfitPercent >= 0 ? 'CHỐT LÃI' : 'CẮT LỖ'} {item.sellProfitPercent > 0 ? '+' : ''}{item.sellProfitPercent.toFixed(2)}%
+                        </span>
+                      ) : (
+                        item.note
+                      )}
+                    </td>
                   </tr>
                 );
               })}
               {portfolioData.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-20 text-center text-slate-300 font-black uppercase tracking-widest">
+                  <td colSpan={8} className="px-6 py-20 text-center text-slate-300 font-black uppercase tracking-widest">
                     Chưa có dữ liệu danh mục
                   </td>
                 </tr>
