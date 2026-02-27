@@ -15,6 +15,14 @@ const Banner: React.FC = () => {
             referrerPolicy="no-referrer"
           />
         </div>
+        
+        {/* Financial Icon Background */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-[0.05]">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-[40rem] h-[40rem] text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        </div>
+
         <div className="absolute inset-0 bg-gradient-to-r from-[#003d60] via-transparent to-[#003d60] opacity-80"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-[#003d60] via-transparent to-[#003d60] opacity-80"></div>
       </div>

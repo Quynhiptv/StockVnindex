@@ -131,7 +131,7 @@ const BullBearAction: React.FC = () => {
   [data]);
   
   const lowestClosing = useMemo(() => 
-    data.filter(s => s.category.toLowerCase().includes('thấp nhất')).sort((a, b) => b.changePercent - a.changePercent), 
+    data.filter(s => s.category.toLowerCase().includes('thấp nhất')).sort((a, b) => a.changePercent - b.changePercent), 
   [data]);
 
   if (loading && data.length === 0) {
