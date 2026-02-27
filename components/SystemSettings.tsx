@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
 const PORTFOLIO_URL = 'https://docs.google.com/spreadsheets/d/1ahPELoUrj-w4MtwUY3tK9tL3FkpJBOSt2aIWa8dqQ9A/export?format=csv&gid=0';
+const WATCHLIST_URL = 'https://docs.google.com/spreadsheets/d/1ahPELoUrj-w4MtwUY3tK9tL3FkpJBOSt2aIWa8dqQ9A/export?format=csv&gid=478926059';
 const PRICE_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
 const PASSWORD = '1234566';
 
@@ -16,10 +17,21 @@ interface PortfolioItem {
   holdingSessions: string;
 }
 
+interface WatchlistItem {
+  symbol: string;
+  zone1: number;
+  zone2: number;
+  note: string;
+  marketPrice: number;
+  changePercent: number;
+  proximityPercent: number;
+}
+
 const SystemSettings: React.FC = () => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
-  const [data, setData] = useState<PortfolioItem[]>([]);
+  const [portfolioData, setPortfolioData] = useState<PortfolioItem[]>([]);
+  const [watchlistData, setWatchlistData] = useState<WatchlistItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -111,17 +123,21 @@ const SystemSettings: React.FC = () => {
     setLoading(true);
     try {
       const timestamp = new Date().getTime();
-      const [portRes, priceRes] = await Promise.all([
+      const [portRes, watchRes, priceRes] = await Promise.all([
         fetch(`${PORTFOLIO_URL}&t=${timestamp}`, { cache: 'no-store' }),
+        fetch(`${WATCHLIST_URL}&t=${timestamp}`, { cache: 'no-store' }),
         fetch(`${PRICE_DATA_URL}&t=${timestamp}`, { cache: 'no-store' })
       ]);
 
-      if (!portRes.ok || !priceRes.ok) throw new Error('Lỗi kết nối dữ liệu');
+      if (!portRes.ok || !watchRes.ok || !priceRes.ok) throw new Error('Lỗi kết nối dữ liệu');
 
       const portCSV = await portRes.text();
+      const watchCSV = await watchRes.text();
       const priceCSV = await priceRes.text();
 
-      const portRows = parseCSV(portCSV).slice(2); // Skip header rows 1 and 2
+      const portRows = parseCSV(portCSV).slice(2); 
+      const watchlistRows = parseCSV(watchCSV).slice(2); 
+      
       const priceRows = parseCSV(priceCSV).slice(1);
 
       const priceMap = new Map<string, { price: number, change: number }>();
@@ -135,7 +151,8 @@ const SystemSettings: React.FC = () => {
         }
       });
 
-      const parsedData: PortfolioItem[] = portRows
+      // Process Portfolio Data
+      const parsedPortfolio: PortfolioItem[] = portRows
         .filter(row => row[0] && row[0] !== '')
         .map(row => {
           const symbol = row[0].trim();
@@ -175,7 +192,36 @@ const SystemSettings: React.FC = () => {
           return parseDate(b.recDate) - parseDate(a.recDate);
         });
 
-      setData(parsedData);
+      // Process Watchlist Data
+      const parsedWatchlist: WatchlistItem[] = watchlistRows
+        .filter(row => row[0] && row[0] !== '')
+        .map(row => {
+          const symbol = row[0].trim();
+          const liveData = priceMap.get(symbol) || { price: 0, change: 0 };
+          const zone1 = cleanNumber(row[1]);
+          const zone2 = cleanNumber(row[2]);
+          const marketPrice = liveData.price;
+          
+          // Calculate proximity to zone2 (Vùng giá cao)
+          let proximityPercent = 999;
+          if (marketPrice > 0 && zone2 > 0) {
+            proximityPercent = Math.abs((marketPrice - zone2) / marketPrice) * 100;
+          }
+
+          return {
+            symbol,
+            zone1,
+            zone2,
+            note: row[3],
+            marketPrice,
+            changePercent: liveData.change,
+            proximityPercent
+          };
+        })
+        .sort((a, b) => a.proximityPercent - b.proximityPercent);
+
+      setPortfolioData(parsedPortfolio);
+      setWatchlistData(parsedWatchlist);
       setError(null);
     } catch (err) {
       console.error('Error fetching system settings data:', err);
@@ -277,10 +323,10 @@ const SystemSettings: React.FC = () => {
           </h3>
         </div>
 
-        <div className="overflow-x-auto rounded-3xl border border-slate-100">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="bg-slate-50 text-slate-400 font-black uppercase tracking-wider">
+        <div className="overflow-x-auto rounded-3xl border border-slate-100 max-h-[600px] overflow-y-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-slate-50 text-slate-400 font-black uppercase tracking-wider shadow-sm">
                 <th className="px-6 py-5">Tên cổ phiếu</th>
                 <th className="px-6 py-5">Giá khuyến nghị</th>
                 <th className="px-6 py-5">Số phiên nắm giữ</th>
@@ -291,7 +337,7 @@ const SystemSettings: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {data.map((item, idx) => {
+              {portfolioData.map((item, idx) => {
                 const profitColor = getPriceColor(item.profitPercent);
                 const changeColor = getPriceColor(item.changePercent);
                 
@@ -311,10 +357,68 @@ const SystemSettings: React.FC = () => {
                   </tr>
                 );
               })}
-              {data.length === 0 && !loading && (
+              {portfolioData.length === 0 && !loading && (
                 <tr>
                   <td colSpan={7} className="px-6 py-20 text-center text-slate-300 font-black uppercase tracking-widest">
                     Chưa có dữ liệu danh mục
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-16 mb-6">
+          <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight flex items-center gap-3">
+            <div className="w-2 h-6 bg-blue-500 rounded-full"></div>
+            Cổ phiếu trong tầm ngắm phiên tới
+          </h3>
+          <div className="flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-widest mt-2">
+            <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100">Thực hiện: Cao Giang</span>
+            <span className="text-slate-400 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 italic">Cập nhật: {new Date().toLocaleDateString('vi-VN')}</span>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto rounded-3xl border border-slate-100 max-h-[600px] overflow-y-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-slate-50 text-slate-400 font-black uppercase tracking-wider shadow-sm">
+                <th className="px-6 py-5">Tên cổ phiếu</th>
+                <th className="px-6 py-5">Vùng giá thấp</th>
+                <th className="px-6 py-5">Vùng giá cao</th>
+                <th className="px-6 py-5">Giá thị trường</th>
+                <th className="px-6 py-5">% Thay đổi trong phiên</th>
+                <th className="px-6 py-5">Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {watchlistData.map((item, idx) => {
+                const changeColor = getPriceColor(item.changePercent);
+                const isInZone = item.marketPrice > 0 && 
+                                 item.marketPrice >= Math.min(item.zone1, item.zone2) && 
+                                 item.marketPrice <= Math.max(item.zone1, item.zone2);
+                
+                return (
+                  <tr key={`${item.symbol}-watch-${idx}`} className="hover:bg-slate-50 transition-colors group">
+                    <td className={`px-6 py-5 font-black ${changeColor}`}>{item.symbol}</td>
+                    <td className={`px-6 py-5 font-bold transition-all ${isInZone ? 'bg-amber-100 animate-pulse text-amber-900' : 'text-slate-900'}`}>
+                      {item.zone1.toLocaleString('vi-VN')}
+                    </td>
+                    <td className={`px-6 py-5 font-bold transition-all ${isInZone ? 'bg-amber-100 animate-pulse text-amber-900' : 'text-slate-900'}`}>
+                      {item.zone2.toLocaleString('vi-VN')}
+                    </td>
+                    <td className={`px-6 py-5 font-black ${changeColor}`}>{item.marketPrice.toLocaleString('vi-VN')}</td>
+                    <td className={`px-6 py-5 font-black ${changeColor}`}>
+                      {item.changePercent > 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
+                    </td>
+                    <td className="px-6 py-5 text-slate-500 font-medium max-w-xs truncate">{item.note}</td>
+                  </tr>
+                );
+              })}
+              {watchlistData.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-20 text-center text-slate-300 font-black uppercase tracking-widest">
+                    Chưa có dữ liệu tầm ngắm
                   </td>
                 </tr>
               )}
