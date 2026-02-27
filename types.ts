@@ -10,7 +10,8 @@ export enum MarketTab {
   ATC_PRICE_ACTION = 'ATC Kéo/Đạp',
   ATC_FOREIGN = 'ATC Khối Ngoại',
   STOCK_LIST = 'Danh Sách CP',
-  RECOMMENDATIONS = 'Danh Mục Khuyến Nghị'
+  RECOMMENDATIONS = 'Danh Mục Khuyến Nghị',
+  SYSTEM_SETTINGS = 'Cài đặt Hệ thống'
 }
 
 export interface MarketIndexData {

@@ -14,6 +14,7 @@ import ActiveBuySell from './components/ActiveBuySell';
 import BigOrderFilter from './components/BigOrderFilter';
 import RecommendationPortfolio from './components/RecommendationPortfolio';
 import SectorAnalysis from './components/SectorAnalysis';
+import SystemSettings from './components/SystemSettings';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<MarketTab>(() => {
@@ -75,6 +76,8 @@ const App: React.FC = () => {
         return <StockList />;
       case MarketTab.RECOMMENDATIONS:
         return <RecommendationPortfolio />;
+      case MarketTab.SYSTEM_SETTINGS:
+        return <SystemSettings />;
       default:
         return (
           <div className="flex flex-col items-center justify-center py-24 bg-white border border-dashed border-slate-200 rounded-[2.5rem]">
