@@ -45,9 +45,8 @@ const Banner: React.FC = () => {
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[0.95] drop-shadow-2xl uppercase tracking-tighter mb-2">
-              Thống kê <br className="hidden md:block" />
-              thị trường <br className="hidden md:block" /> 
-              Chứng khoán VN
+              DỮ LIỆU CHỨNG KHOÁN <br className="hidden md:block" />
+              VIỆT NAM
             </h1>
             
             <div className="flex flex-col md:flex-row items-center lg:items-start gap-4 mt-4">
