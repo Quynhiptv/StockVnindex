@@ -36,6 +36,14 @@ const SystemSettings: React.FC = () => {
   const [watchlistData, setWatchlistData] = useState<WatchlistItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showStats, setShowStats] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [statsResult, setStatsResult] = useState<{
+    totalTrades: number;
+    avgProfit: number;
+    trades: PortfolioItem[];
+  } | null>(null);
 
   const parseCSV = (csv: string) => {
     return csv.split('\n').map(row => {
@@ -120,6 +128,19 @@ const SystemSettings: React.FC = () => {
     return `T + ${sessions}`;
   };
 
+  const parseDateStr = (dateStr: string) => {
+    if (!dateStr) return 0;
+    const parts = dateStr.split(/[/ -]/);
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime();
+      } else {
+        return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])).getTime();
+      }
+    }
+    return new Date(dateStr).getTime() || 0;
+  };
+
   const fetchData = async () => {
     if (!isUnlocked) return;
     setLoading(true);
@@ -187,19 +208,7 @@ const SystemSettings: React.FC = () => {
           };
         })
         .sort((a, b) => {
-          const parseDate = (dateStr: string) => {
-            if (!dateStr) return 0;
-            const parts = dateStr.split(/[/ -]/);
-            if (parts.length === 3) {
-              if (parts[0].length === 4) {
-                return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime();
-              } else {
-                return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])).getTime();
-              }
-            }
-            return new Date(dateStr).getTime() || 0;
-          };
-          return parseDate(b.recDate) - parseDate(a.recDate);
+          return parseDateStr(b.recDate) - parseDateStr(a.recDate);
         });
 
       // Process Watchlist Data
@@ -272,6 +281,36 @@ const SystemSettings: React.FC = () => {
     return 'text-amber-500';
   };
 
+  const handleFilterStats = () => {
+    if (!startDate || !endDate) {
+      alert('Vui lòng chọn đầy đủ ngày bắt đầu và kết thúc!');
+      return;
+    }
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const startTime = start.getTime();
+
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+    const endTime = end.getTime();
+
+    const successfulTrades = portfolioData.filter(item => {
+      if (item.sellPrice <= 0) return false;
+      const tradeTime = parseDateStr(item.recDate);
+      return tradeTime >= startTime && tradeTime <= endTime;
+    });
+
+    const totalProfit = successfulTrades.reduce((sum, item) => sum + item.sellProfitPercent, 0);
+    const avgProfit = successfulTrades.length > 0 ? totalProfit / successfulTrades.length : 0;
+
+    setStatsResult({
+      totalTrades: successfulTrades.length,
+      avgProfit,
+      trades: successfulTrades
+    });
+  };
+
   if (!isUnlocked) {
     return (
       <div className="flex flex-col items-center justify-center py-40">
@@ -311,6 +350,15 @@ const SystemSettings: React.FC = () => {
               <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100">Thực hiện: Giang Cao Team</span>
               <span className="text-slate-400 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 italic">Cập nhật: {new Date().toLocaleDateString('vi-VN')}</span>
             </div>
+            <button 
+              onClick={() => setShowStats(!showStats)}
+              className="mt-4 flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-100 hover:bg-indigo-100 transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Thống kê giao dịch
+            </button>
           </div>
           <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
              <div className="flex flex-col items-end">
@@ -325,6 +373,91 @@ const SystemSettings: React.FC = () => {
               </button>
           </div>
         </div>
+
+        {showStats && (
+          <div className="mb-10 p-8 bg-indigo-50/50 rounded-[2rem] border border-indigo-100 animate-slideDown">
+            <div className="flex flex-wrap items-end gap-6 mb-8">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Ngày bắt đầu</label>
+                <input 
+                  type="date" 
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="px-4 py-3 bg-white border border-indigo-100 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Ngày kết thúc</label>
+                <input 
+                  type="date" 
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="px-4 py-3 bg-white border border-indigo-100 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <button 
+                onClick={handleFilterStats}
+                className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-200 transition-all active:scale-95"
+              >
+                Bắt đầu lọc
+              </button>
+            </div>
+
+            {statsResult && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-white p-6 rounded-2xl border border-indigo-100 shadow-sm">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tổng số lệnh thành công</p>
+                    <p className="text-2xl font-black text-indigo-600">{statsResult.totalTrades} <span className="text-xs font-bold text-slate-400">LỆNH</span></p>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border border-indigo-100 shadow-sm">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Lãi lỗ bình quân</p>
+                    <p className={`text-2xl font-black ${statsResult.avgProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {statsResult.avgProfit > 0 ? '+' : ''}{statsResult.avgProfit.toFixed(2)}%
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-indigo-100 shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 bg-indigo-50 border-b border-indigo-100">
+                    <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Chi tiết các mã đã thực hiện</h4>
+                  </div>
+                  <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
+                    <table className="w-full text-left text-[11px]">
+                      <thead className="sticky top-0 bg-white z-10">
+                        <tr className="text-slate-400 font-black uppercase tracking-wider border-b border-slate-100">
+                          <th className="px-6 py-4">Mã CP</th>
+                          <th className="px-6 py-4">Ngày mua</th>
+                          <th className="px-6 py-4">Giá mua</th>
+                          <th className="px-6 py-4">Giá bán</th>
+                          <th className="px-6 py-4">Kết quả</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {statsResult.trades.map((trade, i) => (
+                          <tr key={i} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-6 py-4 font-black text-slate-900">{trade.symbol}</td>
+                            <td className="px-6 py-4 font-bold text-slate-500">{trade.recDate}</td>
+                            <td className="px-6 py-4 font-bold text-slate-900">{trade.recPrice.toLocaleString('vi-VN')}</td>
+                            <td className="px-6 py-4 font-bold text-slate-900">{trade.sellPrice.toLocaleString('vi-VN')}</td>
+                            <td className={`px-6 py-4 font-black ${trade.sellProfitPercent >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                              {trade.sellProfitPercent > 0 ? '+' : ''}{trade.sellProfitPercent.toFixed(2)}%
+                            </td>
+                          </tr>
+                        ))}
+                        {statsResult.trades.length === 0 && (
+                          <tr>
+                            <td colSpan={5} className="px-6 py-10 text-center text-slate-300 font-black uppercase tracking-widest">Không có giao dịch trong khoảng thời gian này</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="mb-6">
           <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight flex items-center gap-3">
