@@ -37,13 +37,13 @@ const getTrendColor = (change: number) => {
 
 const TableHeader = () => (
   <thead>
-    <tr className="text-slate-400 text-[10px] font-black uppercase tracking-wider border-b border-slate-100">
-      <th className="px-5 py-5 sticky left-0 bg-white z-10">Tên cổ phiếu</th>
-      <th className="px-5 py-5 text-right">KL Bán</th>
-      <th className="px-5 py-5 text-right">KL Mua</th>
-      <th className="px-5 py-5 text-right">% KL Dòng</th>
-      <th className="px-5 py-5 text-right">Giá</th>
-      <th className="px-5 py-5 text-right">% Thay đổi</th>
+    <tr className="text-slate-400 text-[9px] font-black uppercase tracking-wider border-b border-slate-100">
+      <th className="px-3 py-4 sticky left-0 bg-white z-10">Mã CP</th>
+      <th className="px-2 py-4 text-right">KL Bán</th>
+      <th className="px-2 py-4 text-right">KL Mua</th>
+      <th className="px-2 py-4 text-right">% KL Dòng</th>
+      <th className="px-2 py-4 text-right">Giá</th>
+      <th className="px-2 py-4 text-right">% Thay đổi</th>
     </tr>
   </thead>
 );
@@ -54,21 +54,21 @@ const StockRow: React.FC<{ item: ActiveStockData }> = ({ item }) => {
 
   return (
     <tr className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-      <td className={`px-5 py-5 font-black text-xs sticky left-0 bg-white group-hover:bg-slate-50 ${priceColor}`}>{item.symbol}</td>
-      <td className="px-5 py-5 text-right font-black text-xs text-rose-600 tabular-nums">
-        {item.sellVol.toLocaleString('vi-VN')} CP
+      <td className={`px-3 py-4 font-black text-[11px] sticky left-0 bg-white group-hover:bg-slate-50 ${priceColor}`}>{item.symbol}</td>
+      <td className="px-2 py-4 text-right font-black text-[10px] text-rose-600 tabular-nums">
+        {item.sellVol.toLocaleString('vi-VN')}
       </td>
-      <td className="px-5 py-5 text-right font-black text-xs text-emerald-600 tabular-nums">
-        {item.buyVol.toLocaleString('vi-VN')} CP
+      <td className="px-2 py-4 text-right font-black text-[10px] text-emerald-600 tabular-nums">
+        {item.buyVol.toLocaleString('vi-VN')}
       </td>
-      <td className={`px-5 py-5 text-right font-black text-xs ${flowColor} tabular-nums`}>
-        {item.netFlowPercent > 0 ? '+' : ''}{item.netFlowPercent.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
+      <td className={`px-2 py-4 text-right font-black text-[10px] ${flowColor} tabular-nums`}>
+        {item.netFlowPercent > 0 ? '+' : ''}{item.netFlowPercent.toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
       </td>
-      <td className={`px-5 py-5 text-right font-black text-xs ${priceColor} tabular-nums`}>
+      <td className={`px-2 py-4 text-right font-black text-[10px] ${priceColor} tabular-nums`}>
         {item.currentPrice.toLocaleString('vi-VN', { minimumFractionDigits: 1 })}
       </td>
-      <td className={`px-5 py-5 text-right font-black text-xs ${priceColor} tabular-nums`}>
-        {item.changePercent > 0 ? '+' : ''}{item.changePercent.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
+      <td className={`px-2 py-4 text-right font-black text-[10px] ${priceColor} tabular-nums`}>
+        {item.changePercent > 0 ? '+' : ''}{item.changePercent.toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
       </td>
     </tr>
   );
@@ -224,7 +224,7 @@ const ActiveBuySell: React.FC = () => {
             </span>
           </div>
           <div className="overflow-x-auto no-scrollbar">
-            <table className="w-full text-left min-w-[700px]">
+            <table className="w-full text-left">
               <TableHeader />
               <tbody className="divide-y divide-slate-50">
                 {buyList.map(item => <StockRow key={item.symbol} item={item} />)}
@@ -244,7 +244,7 @@ const ActiveBuySell: React.FC = () => {
             </span>
           </div>
           <div className="overflow-x-auto no-scrollbar">
-            <table className="w-full text-left min-w-[700px]">
+            <table className="w-full text-left">
               <TableHeader />
               <tbody className="divide-y divide-slate-50">
                 {sellList.map(item => <StockRow key={item.symbol} item={item} />)}
