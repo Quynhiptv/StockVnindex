@@ -353,7 +353,7 @@ const SystemSettings: React.FC = () => {
                 const changeColor = getPriceColor(item.changePercent);
                 
                 return (
-                  <tr key={`${item.symbol}-${idx}`} className="hover:bg-slate-50 transition-colors group">
+                  <tr key={`${item.symbol}-${idx}`} className={`hover:bg-slate-50 transition-all group ${item.sellPrice > 0 ? 'opacity-40 grayscale-[0.5]' : ''}`}>
                     <td className={`px-6 py-5 font-black ${profitColor}`}>{item.symbol}</td>
                     <td className="px-6 py-5 font-bold text-slate-900">{item.recPrice.toLocaleString('vi-VN')}</td>
                     <td className="px-6 py-5 font-black text-blue-600">{item.holdingSessions}</td>
