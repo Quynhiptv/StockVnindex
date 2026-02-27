@@ -133,9 +133,9 @@ const App: React.FC = () => {
          <div className="flex flex-col items-center gap-4">
            <div className="w-10 h-1 bg-slate-200 rounded-full mb-2"></div>
            <p className="text-slate-400 text-[11px] font-black tracking-[0.3em] uppercase">
-            © 2024 Đoàn Quỳnh Team • Hệ thống phân tích chứng khoán chuyên nghiệp
+            © 2020 Đoàn Quỳnh Team • Hệ thống phân tích chứng khoán chuyên nghiệp
            </p>
-           <p className="text-slate-300 text-[10px] italic">Dữ liệu được cập nhật từ các nguồn uy tín nhất thị trường VN</p>
+           <p className="text-slate-300 text-[10px] italic">Dữ liệu được cập nhật từ các nguồn uy tín nhất thị trường</p>
          </div>
       </footer>
     </div>
