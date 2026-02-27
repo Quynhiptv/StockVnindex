@@ -7,31 +7,31 @@ const Banner: React.FC = () => {
     <div className="relative w-full h-auto min-h-[16rem] md:h-[22rem] bg-gradient-to-br from-[#003d60] via-[#004d7a] to-[#002d4a] overflow-hidden py-8 md:py-0 flex items-center">
       {/* Background Image - Centered and Dimmed */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <div className="relative w-full max-w-4xl h-full opacity-[0.12] blur-[1px] transform -rotate-3 scale-125">
+        <div className="relative w-full max-w-6xl h-full opacity-[0.25] transform -rotate-2 scale-110">
           <img 
             src="https://images.unsplash.com/photo-1611974717482-48a66500516e?q=80&w=2070&auto=format&fit=crop" 
             alt="Market Chart Background" 
-            className="w-full h-full object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]"
+            className="w-full h-full object-cover mix-blend-luminosity"
             referrerPolicy="no-referrer"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#003d60] via-transparent to-[#003d60]"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#003d60] via-transparent to-[#003d60]"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[#003d60] via-transparent to-[#003d60] opacity-80"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#003d60] via-transparent to-[#003d60] opacity-80"></div>
       </div>
 
       {/* Background patterns */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
         <div className="grid grid-cols-12 h-full">
           {Array.from({ length: 48 }).map((_, i) => (
-            <div key={i} className="border-[0.5px] border-white/5"></div>
+            <div key={i} className="border-[0.5px] border-white/10"></div>
           ))}
         </div>
       </div>
 
       {/* Animated Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/20 blur-[120px] rounded-full animate-pulse"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/30 blur-[120px] rounded-full animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/20 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
 
       <div className="container mx-auto px-4 md:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
@@ -44,15 +44,17 @@ const Banner: React.FC = () => {
               Dữ liệu thời gian thực
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[0.95] drop-shadow-2xl uppercase tracking-tighter mb-2">
-              DỮ LIỆU CHỨNG KHOÁN <br className="hidden md:block" />
-              VIỆT NAM
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] drop-shadow-2xl uppercase tracking-tighter mb-2">
+              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-blue-200">
+                DỮ LIỆU CHỨNG KHOÁN <br className="hidden md:block" />
+                VIỆT NAM
+              </span>
             </h1>
             
             <div className="flex flex-col md:flex-row items-center lg:items-start gap-4 mt-4">
               <div className="h-px w-12 bg-blue-400/50 hidden md:block mt-4"></div>
-              <p className="text-blue-200/80 text-base md:text-xl font-medium italic tracking-tight">
-                Thống kê dòng tiền và phân tích chuyên sâu
+              <p className="text-blue-100/90 text-base md:text-xl font-bold italic tracking-tight uppercase">
+                Thống kê dòng tiền & Phân tích chuyên sâu
               </p>
             </div>
           </div>
