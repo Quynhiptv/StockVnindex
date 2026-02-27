@@ -12,9 +12,10 @@ interface StockListItem {
   targetPrice: number;
   currentPrice: number;
   changePercent: number;
+  requiredDropPercent: number;
 }
 
-type SortKey = keyof StockListItem;
+type SortKey = keyof StockListItem | 'priority';
 type SortOrder = 'asc' | 'desc';
 
 const StockList: React.FC = () => {
@@ -22,7 +23,7 @@ const StockList: React.FC = () => {
   const [updateTime, setUpdateTime] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sortConfig, setSortConfig] = useState<{ key: SortKey; order: SortOrder }>({ key: 'symbol', order: 'asc' });
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; order: SortOrder }>({ key: 'priority', order: 'asc' });
 
   const parseCSV = (csv: string) => {
     return csv.split('\n').map(row => {
@@ -105,15 +106,29 @@ const StockList: React.FC = () => {
         .map(row => {
           const symbol = row[0].trim();
           const liveData = priceMap.get(symbol) || { price: 0, change: 0 };
+          const exploratoryPrice = cleanNumber(row[3]);
+          const currentPrice = liveData.price;
+          
+          let requiredDropPercent = 0;
+          if (exploratoryPrice > 0 && currentPrice > 0) {
+            if (currentPrice > exploratoryPrice) {
+              requiredDropPercent = ((currentPrice - exploratoryPrice) / currentPrice) * 100;
+            } else {
+              requiredDropPercent = 0; // Already at or below buy point
+            }
+          } else {
+            requiredDropPercent = 999; // No target price, put at bottom
+          }
           
           return {
             symbol: symbol,
             zone1: cleanNumber(row[1]),
             zone2: cleanNumber(row[2]),
-            exploratoryPrice: cleanNumber(row[3]),
+            exploratoryPrice: exploratoryPrice,
             targetPrice: cleanNumber(row[4]),
-            currentPrice: liveData.price,
-            changePercent: liveData.change
+            currentPrice: currentPrice,
+            changePercent: liveData.change,
+            requiredDropPercent: requiredDropPercent
           };
         });
 
@@ -143,8 +158,28 @@ const StockList: React.FC = () => {
 
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => {
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
+      if (sortConfig.key === 'priority') {
+        const getPriority = (item: StockListItem) => {
+          if (item.exploratoryPrice > 0) return 1;
+          if (item.zone1 > 0 || item.zone2 > 0) return 2;
+          return 3;
+        };
+        
+        const pA = getPriority(a);
+        const pB = getPriority(b);
+        
+        if (pA !== pB) return pA - pB;
+        
+        if (pA === 1) {
+          // Both have exploratory price, sort by drop percent ASC
+          return a.requiredDropPercent - b.requiredDropPercent;
+        }
+        
+        return a.symbol.localeCompare(b.symbol);
+      }
+
+      const aValue = a[sortConfig.key as keyof StockListItem];
+      const bValue = b[sortConfig.key as keyof StockListItem];
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortConfig.order === 'asc' 
           ? aValue.localeCompare(bValue) 
@@ -213,7 +248,8 @@ const StockList: React.FC = () => {
                   { key: 'exploratoryPrice', label: 'Giá Thăm Dò' },
                   { key: 'targetPrice', label: 'Target Kỳ Vọng' },
                   { key: 'currentPrice', label: 'Giá Hiện Tại' },
-                  { key: 'changePercent', label: '% Thay Đổi' }
+                  { key: 'changePercent', label: '% Thay Đổi' },
+                  { key: 'requiredDropPercent', label: 'Cần giảm % để Mua' }
                 ].map((col) => (
                   <th 
                     key={col.key} 
@@ -270,6 +306,18 @@ const StockList: React.FC = () => {
 
                     <td className={`px-6 py-5 font-black ${trendColor}`}>
                       {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                    </td>
+
+                    <td className="px-6 py-5">
+                      {stock.exploratoryPrice > 0 ? (
+                        <div className="flex items-center gap-2">
+                          <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${stock.requiredDropPercent === 0 ? 'bg-emerald-500 text-white animate-pulse' : 'bg-slate-100 text-slate-600'}`}>
+                            {stock.requiredDropPercent === 0 ? 'ĐIỂM MUA' : `-${stock.requiredDropPercent.toFixed(2)}%`}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-slate-300">-</span>
+                      )}
                     </td>
                   </tr>
                 );
