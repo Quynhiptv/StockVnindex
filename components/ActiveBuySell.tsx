@@ -53,21 +53,21 @@ const StockRow: React.FC<{ item: ActiveStockData }> = ({ item }) => {
   const flowColor = item.netFlowPercent > 0 ? 'text-emerald-600' : 'text-rose-600';
 
   return (
-    <tr className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-      <td className={`px-3 py-4 font-black text-[11px] sticky left-0 bg-white group-hover:bg-slate-50 ${priceColor}`}>{item.symbol}</td>
-      <td className="px-2 py-4 text-right font-black text-[10px] text-rose-600 tabular-nums">
+    <tr className="border-b border-slate-50 hover:bg-slate-50 transition-colors group">
+      <td className={`px-3 py-4 font-black text-[11px] sticky left-0 bg-white group-hover:bg-slate-50 transition-all duration-500 ${priceColor}`}>{item.symbol}</td>
+      <td className="px-2 py-4 text-right font-black text-[10px] text-rose-600 tabular-nums transition-all duration-500">
         {item.sellVol.toLocaleString('vi-VN')}
       </td>
-      <td className="px-2 py-4 text-right font-black text-[10px] text-emerald-600 tabular-nums">
+      <td className="px-2 py-4 text-right font-black text-[10px] text-emerald-600 tabular-nums transition-all duration-500">
         {item.buyVol.toLocaleString('vi-VN')}
       </td>
-      <td className={`px-2 py-4 text-right font-black text-[10px] ${flowColor} tabular-nums`}>
+      <td className={`px-2 py-4 text-right font-black text-[10px] tabular-nums transition-all duration-500 ${flowColor}`}>
         {item.netFlowPercent > 0 ? '+' : ''}{item.netFlowPercent.toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
       </td>
-      <td className={`px-2 py-4 text-right font-black text-[10px] ${priceColor} tabular-nums`}>
+      <td className={`px-2 py-4 text-right font-black text-[10px] tabular-nums transition-all duration-500 ${priceColor}`}>
         {item.currentPrice.toLocaleString('vi-VN', { minimumFractionDigits: 1 })}
       </td>
-      <td className={`px-2 py-4 text-right font-black text-[10px] ${priceColor} tabular-nums`}>
+      <td className={`px-2 py-4 text-right font-black text-[10px] tabular-nums transition-all duration-500 ${priceColor}`}>
         {item.changePercent > 0 ? '+' : ''}{item.changePercent.toLocaleString('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
       </td>
     </tr>

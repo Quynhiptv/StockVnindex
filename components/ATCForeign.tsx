@@ -124,13 +124,13 @@ const ATCForeign: React.FC = () => {
           </thead>
           <tbody className="divide-y divide-slate-50">
             {list.map((item) => (
-              <tr key={item.symbol} className="hover:bg-slate-50 transition-colors">
-                <td className="px-5 py-4 font-black text-slate-800">{item.symbol}</td>
-                <td className="px-5 py-4 text-right font-black text-slate-500">{item.klAtc.toLocaleString('vi-VN')}</td>
-                <td className={`px-5 py-4 text-right font-black ${item.klDong < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{item.klDong.toLocaleString('vi-VN')} CP</td>
-                <td className={`px-5 py-4 text-right font-black ${item.gtDong < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{item.gtDong.toFixed(1)} tỷ</td>
-                <td className={`px-5 py-4 text-right font-black ${getPercentColor(item.changePercent)}`}>{item.currentPrice}</td>
-                <td className={`px-5 py-4 text-right font-black ${getPercentColor(item.changePercent)}`}>{item.changePercent}%</td>
+              <tr key={item.symbol} className="hover:bg-slate-50 transition-colors group">
+                <td className="px-5 py-4 font-black text-slate-800 transition-all duration-500">{item.symbol}</td>
+                <td className="px-5 py-4 text-right font-black text-slate-500 transition-all duration-500">{item.klAtc.toLocaleString('vi-VN')}</td>
+                <td className={`px-5 py-4 text-right font-black transition-all duration-500 ${item.klDong < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{item.klDong.toLocaleString('vi-VN')} CP</td>
+                <td className={`px-5 py-4 text-right font-black transition-all duration-500 ${item.gtDong < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{item.gtDong.toFixed(1)} tỷ</td>
+                <td className={`px-5 py-4 text-right font-black transition-all duration-500 ${getPercentColor(item.changePercent)}`}>{item.currentPrice}</td>
+                <td className={`px-5 py-4 text-right font-black transition-all duration-500 ${getPercentColor(item.changePercent)}`}>{item.changePercent}%</td>
               </tr>
             ))}
           </tbody>

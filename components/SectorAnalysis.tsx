@@ -400,32 +400,32 @@ const SectorAnalysis: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {sortedData.map((item, index) => (
-                <tr key={`${item.name}-${index}`} className="hover:bg-blue-50/30 transition-all duration-200 group">
-                  <td className="px-6 py-5 font-black text-sm text-slate-900 sticky left-0 bg-white group-hover:bg-blue-50/30 z-10 border-b border-slate-50">
+                <tr key={`${item.name}-${index}`} className="hover:bg-blue-50/30 transition-all duration-500 group">
+                  <td className="px-6 py-5 font-black text-sm text-slate-900 sticky left-0 bg-white group-hover:bg-blue-50/30 z-10 border-b border-slate-50 transition-all duration-500">
                     {item.name}
                   </td>
-                  <td className="px-6 py-5 text-right font-mono font-bold text-sm text-slate-600 tabular-nums border-b border-slate-50">
+                  <td className="px-6 py-5 text-right font-mono font-bold text-sm text-slate-600 tabular-nums border-b border-slate-50 transition-all duration-500">
                     {Math.round(item.volVsPrev)}%
                   </td>
-                  <td className="px-6 py-5 text-right font-mono font-bold text-sm text-slate-600 tabular-nums border-b border-slate-50">
+                  <td className="px-6 py-5 text-right font-mono font-bold text-sm text-slate-600 tabular-nums border-b border-slate-50 transition-all duration-500">
                     {Math.round(item.volVsAvg20)}%
                   </td>
-                  <td className={`px-6 py-5 text-right font-mono font-black text-sm tabular-nums border-b border-slate-50 ${getTrendColor(item.changeToday)}`}>
-                    <div className="flex items-center justify-end gap-1">
+                  <td className={`px-6 py-5 text-right font-mono font-black text-sm tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.changeToday)}`}>
+                    <div className="flex items-center justify-end gap-1 transition-all duration-500">
                       {item.changeToday > 0 ? '▲' : item.changeToday < 0 ? '▼' : '•'}
                       {Math.abs(item.changeToday).toFixed(2)}%
                     </div>
                   </td>
-                  <td className={`px-6 py-5 text-right font-mono font-bold text-sm tabular-nums border-b border-slate-50 ${getTrendColor(item.changePrev)}`}>
+                  <td className={`px-6 py-5 text-right font-mono font-bold text-sm tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.changePrev)}`}>
                     {item.changePrev > 0 ? '+' : ''}{item.changePrev.toFixed(2)}%
                   </td>
-                  <td className="px-6 py-5 text-right font-mono font-black text-sm text-slate-900 tabular-nums border-b border-slate-50">
-                    <span className="px-2 py-1 bg-slate-100 rounded-md">
+                  <td className="px-6 py-5 text-right font-mono font-black text-sm text-slate-900 tabular-nums border-b border-slate-50 transition-all duration-500">
+                    <span className="px-2 py-1 bg-slate-100 rounded-md transition-all duration-500">
                       {item.strengthIndex.toFixed(1)}
                     </span>
                   </td>
-                  <td className={`px-6 py-5 text-right font-mono font-black text-sm tabular-nums border-b border-slate-50 ${getTrendColor(item.strengthChange)}`}>
-                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase ${item.strengthChange > 0 ? 'bg-emerald-50' : item.strengthChange < 0 ? 'bg-rose-50' : 'bg-amber-50'}`}>
+                  <td className={`px-6 py-5 text-right font-mono font-black text-sm tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.strengthChange)}`}>
+                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase transition-all duration-500 ${item.strengthChange > 0 ? 'bg-emerald-50' : item.strengthChange < 0 ? 'bg-rose-50' : 'bg-amber-50'}`}>
                       {item.strengthChange > 0 ? '+' : ''}{Math.round(item.strengthChange)} Bậc
                     </span>
                   </td>

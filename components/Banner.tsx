@@ -43,27 +43,36 @@ const Banner: React.FC = () => {
 
       <div className="container mx-auto px-4 md:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="max-w-4xl text-center lg:text-left">
-            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-emerald-400 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-4 shadow-xl">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              Dữ liệu thời gian thực
+          <div className="max-w-4xl text-center lg:text-left flex flex-col lg:flex-row items-center lg:items-start gap-8">
+            {/* Logo Area (Blue Rectangle from Screenshot) */}
+            <div className="w-24 h-24 md:w-32 md:h-32 bg-blue-600/20 backdrop-blur-xl border-2 border-blue-400/30 rounded-[2rem] flex items-center justify-center shrink-0 shadow-2xl shadow-blue-500/20 group hover:scale-105 transition-transform duration-500">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 md:w-16 md:h-16 text-blue-400 drop-shadow-[0_0_15px_rgba(96,165,250,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
             </div>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] drop-shadow-2xl uppercase tracking-tighter mb-2">
-              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-blue-200">
-                DỮ LIỆU CHỨNG KHOÁN <br className="hidden md:block" />
-                VIỆT NAM
-              </span>
-            </h1>
-            
-            <div className="flex flex-col md:flex-row items-center lg:items-start gap-4 mt-4">
-              <div className="h-px w-12 bg-blue-400/50 hidden md:block mt-4"></div>
-              <p className="text-blue-100/90 text-base md:text-xl font-bold italic tracking-tight uppercase">
-                Thống kê dòng tiền & Phân tích chuyên sâu
-              </p>
+
+            <div className="flex flex-col">
+              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-emerald-400 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-4 shadow-xl self-center lg:self-start">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                Dữ liệu thời gian thực
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.95] drop-shadow-2xl uppercase tracking-tighter mb-2">
+                <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-blue-200">
+                  DỮ LIỆU CHỨNG KHOÁN <br className="hidden md:block" />
+                  VIỆT NAM
+                </span>
+              </h1>
+              
+              <div className="flex flex-col md:flex-row items-center lg:items-start gap-4 mt-4">
+                <div className="h-px w-12 bg-blue-400/50 hidden md:block mt-4"></div>
+                <p className="text-blue-100/90 text-base md:text-xl font-bold italic tracking-tight uppercase">
+                  Thống kê dòng tiền & Phân tích chuyên sâu
+                </p>
+              </div>
             </div>
           </div>
 

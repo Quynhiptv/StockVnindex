@@ -182,12 +182,12 @@ const ForeignFlow: React.FC = () => {
               <tbody className="divide-y divide-slate-50">
                 {topBuy.map((stock) => (
                   <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors group">
-                    <td className="px-5 py-4 font-black text-slate-800">{stock.symbol}</td>
-                    <td className="px-5 py-4 text-right font-black text-emerald-600">{stock.netValue.toFixed(1)}</td>
-                    <td className="px-5 py-4 text-right text-slate-500 font-bold">{stock.avgPrice}</td>
-                    <td className="px-5 py-4 text-right text-emerald-600 font-bold">{stock.buySessions} Phiên</td>
-                    <td className="px-5 py-4 text-right text-slate-800 font-black">{stock.currentPrice}</td>
-                    <td className={`px-5 py-4 text-right font-black ${getChangeColor(stock.changePercent)}`}>
+                    <td className="px-5 py-4 font-black text-slate-800 transition-all duration-500">{stock.symbol}</td>
+                    <td className="px-5 py-4 text-right font-black text-emerald-600 transition-all duration-500">{stock.netValue.toFixed(1)}</td>
+                    <td className="px-5 py-4 text-right text-slate-500 font-bold transition-all duration-500">{stock.avgPrice}</td>
+                    <td className="px-5 py-4 text-right text-emerald-600 font-bold transition-all duration-500">{stock.buySessions} Phiên</td>
+                    <td className="px-5 py-4 text-right text-slate-800 font-black transition-all duration-500">{stock.currentPrice}</td>
+                    <td className={`px-5 py-4 text-right font-black transition-all duration-500 ${getChangeColor(stock.changePercent)}`}>
                       {formatPercent(stock.changePercent)}
                     </td>
                   </tr>
@@ -218,13 +218,13 @@ const ForeignFlow: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {topSell.map((stock) => (
-                  <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-4 font-black text-slate-800">{stock.symbol}</td>
-                    <td className="px-5 py-4 text-right font-black text-rose-600">{Math.abs(stock.netValue).toFixed(1)}</td>
-                    <td className="px-5 py-4 text-right text-slate-500 font-bold">{stock.avgPrice}</td>
-                    <td className="px-5 py-4 text-right text-rose-600 font-bold">{stock.sellSessions} Phiên</td>
-                    <td className="px-5 py-4 text-right text-slate-800 font-black">{stock.currentPrice}</td>
-                    <td className={`px-5 py-4 text-right font-black ${getChangeColor(stock.changePercent)}`}>
+                  <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors group">
+                    <td className="px-5 py-4 font-black text-slate-800 transition-all duration-500">{stock.symbol}</td>
+                    <td className="px-5 py-4 text-right font-black text-rose-600 transition-all duration-500">{Math.abs(stock.netValue).toFixed(1)}</td>
+                    <td className="px-5 py-4 text-right text-slate-500 font-bold transition-all duration-500">{stock.avgPrice}</td>
+                    <td className="px-5 py-4 text-right text-rose-600 font-bold transition-all duration-500">{stock.sellSessions} Phiên</td>
+                    <td className="px-5 py-4 text-right text-slate-800 font-black transition-all duration-500">{stock.currentPrice}</td>
+                    <td className={`px-5 py-4 text-right font-black transition-all duration-500 ${getChangeColor(stock.changePercent)}`}>
                       {formatPercent(stock.changePercent)}
                     </td>
                   </tr>

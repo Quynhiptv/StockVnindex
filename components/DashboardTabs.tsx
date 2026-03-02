@@ -101,7 +101,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({ activeTab, onTabChange })
                 className={`
                   flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all duration-300 border snap-center
                   ${activeTab === tab
-                    ? 'bg-blue-600 border-blue-600 text-white font-black shadow-lg shadow-blue-200 ring-2 ring-blue-100'
+                    ? 'bg-blue-600 border-blue-500 text-white font-black shadow-[0_10px_30px_-10px_rgba(37,99,235,0.6)] ring-4 ring-blue-500/20'
                     : 'bg-slate-50 border-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-100 hover:border-slate-200 font-bold'
                   }
                 `}

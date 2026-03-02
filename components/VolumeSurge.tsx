@@ -47,14 +47,14 @@ const formatVolume = (val: number) => {
 const StockRow: React.FC<{ stock: VolumeSurgeStock }> = ({ stock }) => {
   const color = getPriceColor(stock.changePercent);
   return (
-    <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-      <td className={`px-5 py-4 font-black text-xs ${color}`}>{stock.symbol}</td>
-      <td className={`px-5 py-4 text-right font-black text-xs text-slate-900`}>{stock.price.toLocaleString('vi-VN', { minimumFractionDigits: 1 })}</td>
-      <td className={`px-5 py-4 text-right font-black text-xs ${color}`}>
+    <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors group">
+      <td className={`px-5 py-4 font-black text-xs transition-all duration-500 ${color}`}>{stock.symbol}</td>
+      <td className={`px-5 py-4 text-right font-black text-xs text-slate-900 transition-all duration-500`}>{stock.price.toLocaleString('vi-VN', { minimumFractionDigits: 1 })}</td>
+      <td className={`px-5 py-4 text-right font-black text-xs transition-all duration-500 ${color}`}>
         {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
       </td>
-      <td className="px-5 py-4 text-right font-black text-xs text-slate-700">{stock.volVsAvg20.toFixed(1)}%</td>
-      <td className="px-5 py-4 text-right font-bold text-xs text-slate-400">{formatVolume(stock.volume)}</td>
+      <td className="px-5 py-4 text-right font-black text-xs text-slate-700 transition-all duration-500">{stock.volVsAvg20.toFixed(1)}%</td>
+      <td className="px-5 py-4 text-right font-bold text-xs text-slate-400 transition-all duration-500">{formatVolume(stock.volume)}</td>
     </tr>
   );
 };

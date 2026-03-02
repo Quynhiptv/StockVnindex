@@ -329,40 +329,40 @@ const RecommendationPortfolio: React.FC = () => {
                 const changeColor = changePercent > 0 ? 'text-emerald-600' : changePercent < 0 ? 'text-rose-600' : 'text-amber-500';
                 
                 return (
-                  <tr key={`${item.symbol}-${index}`} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="px-6 py-4">
-                      <span className="text-xs font-bold text-slate-600">{item.group}</span>
+                  <tr key={`${item.symbol}-${index}`} className="hover:bg-slate-50/80 transition-colors duration-500 group">
+                    <td className="px-6 py-4 transition-all duration-500">
+                      <span className="text-xs font-bold text-slate-600 transition-all duration-500">{item.group}</span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-xs font-mono text-slate-500">{item.date}</span>
+                    <td className="px-6 py-4 transition-all duration-500">
+                      <span className="text-xs font-mono text-slate-500 transition-all duration-500">{item.date}</span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-sm font-black uppercase tracking-tight ${profitLossColor}`}>
+                    <td className="px-6 py-4 transition-all duration-500">
+                      <span className={`text-sm font-black uppercase tracking-tight transition-all duration-500 ${profitLossColor}`}>
                         {item.symbol}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className="text-sm font-mono font-medium text-slate-600">
+                    <td className="px-6 py-4 text-right transition-all duration-500">
+                      <span className="text-sm font-mono font-medium text-slate-600 transition-all duration-500">
                         {(item.recommendedPrice * 1000).toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 3 })} VND
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-600 uppercase">
+                    <td className="px-6 py-4 text-center transition-all duration-500">
+                      <span className="px-2.5 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-600 uppercase transition-all duration-500">
                         {calculateTPrefix(item.date)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className={`text-sm font-mono font-bold ${changeColor}`}>
+                    <td className="px-6 py-4 text-right transition-all duration-500">
+                      <span className={`text-sm font-mono font-bold transition-all duration-500 ${changeColor}`}>
                         {(currentPrice * 1000).toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 3 })} VND
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className={`text-sm font-mono font-bold ${changeColor}`}>
+                    <td className="px-6 py-4 text-right transition-all duration-500">
+                      <span className={`text-sm font-mono font-bold transition-all duration-500 ${changeColor}`}>
                         {changePercent > 0 ? '+' : ''}{changePercent.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className={`text-sm font-mono font-black ${profitLossColor}`}>
+                    <td className="px-6 py-4 text-right transition-all duration-500">
+                      <span className={`text-sm font-mono font-black transition-all duration-500 ${profitLossColor}`}>
                         {profitLoss > 0 ? '+' : ''}{profitLoss.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
                       </span>
                     </td>

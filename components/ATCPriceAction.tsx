@@ -62,15 +62,15 @@ const StockRow: React.FC<{ item: ATCPriceItem }> = ({ item }) => {
   });
 
   return (
-    <tr className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-      <td className={`px-5 py-4 font-black text-xs ${dayColor}`}>{item.symbol}</td>
-      <td className={`px-5 py-4 text-right font-black text-xs ${atcColor}`}>
+    <tr className="border-b border-slate-50 hover:bg-slate-50 transition-colors group">
+      <td className={`px-5 py-4 font-black text-xs transition-all duration-500 ${dayColor}`}>{item.symbol}</td>
+      <td className={`px-5 py-4 text-right font-black text-xs transition-all duration-500 ${atcColor}`}>
         {item.atcPercent > 0 ? '+' : ''}{formattedAtc}%
       </td>
-      <td className={`px-5 py-4 text-right font-black text-xs ${dayColor}`}>
+      <td className={`px-5 py-4 text-right font-black text-xs transition-all duration-500 ${dayColor}`}>
         {formattedPrice}
       </td>
-      <td className={`px-5 py-4 text-right font-black text-xs ${dayColor}`}>
+      <td className={`px-5 py-4 text-right font-black text-xs transition-all duration-500 ${dayColor}`}>
         {item.dayChangePercent > 0 ? '+' : ''}{formattedDayChange}%
       </td>
     </tr>
