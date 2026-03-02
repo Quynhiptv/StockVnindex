@@ -79,7 +79,7 @@ const SectorAnalysis: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const timestamp = new Date().getTime();
+      const timestamp = Date.now();
       const response = await fetch(`${SECTOR_DATA_URL}&t=${timestamp}`, { cache: 'no-store' });
 
       if (!response.ok) throw new Error('Không thể tải dữ liệu nhóm ngành');
@@ -176,7 +176,7 @@ const SectorAnalysis: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 30000); // 30s
+    const interval = setInterval(fetchData, 5000); // 5s
     return () => clearInterval(interval);
   }, []);
 

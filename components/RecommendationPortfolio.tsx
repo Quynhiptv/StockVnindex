@@ -110,12 +110,13 @@ const RecommendationPortfolio: React.FC = () => {
 
   const fetchData = async () => {
     try {
+      const timestamp = Date.now();
       // Fetch Recommendations
-      const recResponse = await fetch('https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/gviz/tq?tqx=out:csv&gid=2082559901');
+      const recResponse = await fetch(`https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/gviz/tq?tqx=out:csv&gid=2082559901&t=${timestamp}`, { cache: 'no-store' });
       const recCsvText = await recResponse.text();
       
       // Fetch Price Data
-      const priceResponse = await fetch('https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/gviz/tq?tqx=out:csv&gid=1628670680');
+      const priceResponse = await fetch(`https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/gviz/tq?tqx=out:csv&gid=1628670680&t=${timestamp}`, { cache: 'no-store' });
       const priceCsvText = await priceResponse.text();
 
       // Parse Price CSV

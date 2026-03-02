@@ -39,9 +39,10 @@ const ATCForeign: React.FC = () => {
 
   const fetchData = async () => {
     try {
+      const timestamp = Date.now();
       const [atcRes, priceRes] = await Promise.all([
-        fetch(ATC_DATA_URL),
-        fetch(PRICE_DATA_URL)
+        fetch(`${ATC_DATA_URL}&t=${timestamp}`, { cache: 'no-store' }),
+        fetch(`${PRICE_DATA_URL}&t=${timestamp}`, { cache: 'no-store' })
       ]);
       if (!atcRes.ok || !priceRes.ok) throw new Error('Không thể tải dữ liệu ATC');
       const atcCSV = await atcRes.text();

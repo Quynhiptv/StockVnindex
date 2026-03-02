@@ -107,7 +107,7 @@ const App: React.FC = () => {
         />
       </div>
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 mt-6 md:mt-10 flex-grow max-w-7xl">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 mt-6 md:mt-10 flex-grow max-w-[1600px]">
         <div className="mb-8 md:mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
                 <div className="w-2 h-10 bg-blue-600 rounded-full shrink-0 shadow-lg shadow-blue-200"></div>

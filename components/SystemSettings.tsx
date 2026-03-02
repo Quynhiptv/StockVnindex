@@ -253,7 +253,7 @@ const SystemSettings: React.FC = () => {
   useEffect(() => {
     if (isUnlocked) {
       fetchData();
-      const interval = setInterval(fetchData, 6000);
+      const interval = setInterval(fetchData, 5000);
       return () => clearInterval(interval);
     }
   }, [isUnlocked]);
@@ -363,7 +363,7 @@ const SystemSettings: React.FC = () => {
           <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
              <div className="flex flex-col items-end">
                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Auto refresh</span>
-                <span className="text-[10px] font-bold text-emerald-600 mt-1">LÀM MỚI SAU 6S</span>
+                <span className="text-[10px] font-bold text-emerald-600 mt-1">LÀM MỚI SAU 5S</span>
              </div>
              <button onClick={fetchData} className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-200 transition-all active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">

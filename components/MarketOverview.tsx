@@ -208,6 +208,8 @@ const MarketOverview: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [lastUpdated, setLastUpdated] = useState<string>('');
+
   const fetchData = async () => {
     try {
       const timestamp = new Date().getTime();
@@ -220,6 +222,7 @@ const MarketOverview: React.FC = () => {
       
       const indexCSV = await indexRes.text();
       const momentumCSV = await momentumRes.text();
+      setLastUpdated(new Date().toLocaleTimeString('vi-VN'));
 
       const parseRows = (csv: string) => {
         return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
@@ -298,7 +301,7 @@ const MarketOverview: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 15000); 
+    const interval = setInterval(fetchData, 5000); 
     return () => clearInterval(interval);
   }, []);
 
@@ -314,7 +317,15 @@ const MarketOverview: React.FC = () => {
             </div>
             <div>
               <h2 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter leading-none uppercase">CHỈ SỐ THỊ TRƯỜNG</h2>
-              <p className="text-[10px] font-black text-slate-400 mt-2 uppercase tracking-[0.25em]">DÒNG TIỀN & ĐỘNG LƯỢNG THỰC THỜI</p>
+              <div className="flex items-center gap-3 mt-2">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">DÒNG TIỀN & ĐỘNG LƯỢNG THỰC THỜI</p>
+                {lastUpdated && (
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100">
+                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span className="text-[9px] font-black uppercase tracking-widest">{lastUpdated}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <button onClick={fetchData} disabled={loading} className="group flex items-center justify-center gap-3 px-8 py-3.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-2xl shadow-sm transition-all active:scale-95">
