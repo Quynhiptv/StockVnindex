@@ -123,7 +123,12 @@ const ForeignFlow: React.FC = () => {
   
   const chartData = [...top10Buy, ...top10Sell]
     .sort((a, b) => b.netValue - a.netValue)
-    .map(d => ({ name: d.symbol, value: d.netValue }));
+    .map(d => ({ 
+      name: d.symbol, 
+      value: d.netValue,
+      currentPrice: d.currentPrice,
+      changePercent: d.changePercent
+    }));
 
   return (
     <div className="space-y-8 animate-fadeIn pb-12">
@@ -148,7 +153,36 @@ const ForeignFlow: React.FC = () => {
               <YAxis stroke="#94a3b8" fontSize={10} axisLine={false} tickLine={false} />
               <Tooltip 
                 cursor={{fill: '#f8fafc'}}
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', fontSize: '11px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const d = payload[0].payload;
+                    const changeColor = getChangeColor(d.changePercent);
+                    return (
+                      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xl ring-1 ring-slate-100 min-w-[180px]">
+                        <p className="text-sm font-black text-slate-900 mb-3 uppercase tracking-widest border-b border-slate-50 pb-2">{d.name}</p>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center gap-4">
+                            <span className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">Giá trị ròng</span>
+                            <span className={`text-xs font-black ${d.value >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                              {d.value.toFixed(1)} tỷ
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center gap-4">
+                            <span className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">Giá hiện tại</span>
+                            <span className={`text-xs font-black ${changeColor}`}>{d.currentPrice}</span>
+                          </div>
+                          <div className="flex justify-between items-center gap-4">
+                            <span className="text-[10px] text-slate-400 font-black uppercase tracking-tighter">% Thay đổi</span>
+                            <span className={`text-xs font-black ${changeColor}`}>
+                              {formatPercent(d.changePercent)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
               <ReferenceLine y={0} stroke="#cbd5e1" />
               <Bar dataKey="value" radius={[4, 4, 0, 0]}>
