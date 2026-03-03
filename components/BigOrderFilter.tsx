@@ -113,8 +113,8 @@ const BigOrderFilter: React.FC = () => {
           const symbol = cols[0].toUpperCase();
           foreignDataMap[symbol] = {
             symbol,
-            buyVol: cleanNum(cols[2]),
-            sellVol: cleanNum(cols[5]),
+            buyVol: cleanNum(cols[5]),
+            sellVol: cleanNum(cols[2]),
             netVol: cleanNum(cols[8]),
             netValue: cleanNum(cols[9]),
             buySessions: parseInt(cols[12]) || 0,

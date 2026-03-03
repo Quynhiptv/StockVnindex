@@ -69,7 +69,7 @@ const ForeignFlow: React.FC = () => {
           
           return {
             symbol,
-            netVolume: parseFloat(row[8]?.replace(/\./g, '').replace(',', '.')) || 0,
+            netVolume: (parseFloat(row[8]?.replace(/\./g, '').replace(',', '.')) || 0),
             netValue: (parseFloat(row[9]?.replace(/\./g, '').replace(',', '.')) || 0) / 1000000000,
             avgPrice: row[10] || '-',
             buySessions: parseInt(row[12]) || 0,
