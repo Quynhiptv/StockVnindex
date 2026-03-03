@@ -118,9 +118,11 @@ const ForeignFlow: React.FC = () => {
   const topBuy = [...data].filter(d => d.netValue > 0).sort((a, b) => b.netValue - a.netValue).slice(0, 20);
   const topSell = [...data].filter(d => d.netValue < 0).sort((a, b) => a.netValue - b.netValue).slice(0, 20);
   
-  const chartData = [...data]
-    .sort((a, b) => Math.abs(b.netValue) - Math.abs(a.netValue))
-    .slice(0, 10)
+  const top10Buy = [...data].filter(d => d.netValue > 0).sort((a, b) => b.netValue - a.netValue).slice(0, 10);
+  const top10Sell = [...data].filter(d => d.netValue < 0).sort((a, b) => a.netValue - b.netValue).slice(0, 10);
+  
+  const chartData = [...top10Buy, ...top10Sell]
+    .sort((a, b) => b.netValue - a.netValue)
     .map(d => ({ name: d.symbol, value: d.netValue }));
 
   return (
@@ -133,7 +135,7 @@ const ForeignFlow: React.FC = () => {
             </svg>
           </div>
           <div>
-            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">TOP 10 GIAO DỊCH RÒNG KHỐI NGOẠI (TỶ VNĐ)</h3>
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">TOP 20 GIAO DỊCH RÒNG KHỐI NGOẠI (TỶ VNĐ)</h3>
             <p className="text-[10px] text-slate-400 font-bold">Dữ liệu cập nhật: {new Date().toLocaleDateString('vi-VN')}</p>
           </div>
         </div>
