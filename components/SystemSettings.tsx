@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 const PORTFOLIO_URL = 'https://docs.google.com/spreadsheets/d/1ahPELoUrj-w4MtwUY3tK9tL3FkpJBOSt2aIWa8dqQ9A/export?format=csv&gid=0';
 const WATCHLIST_URL = 'https://docs.google.com/spreadsheets/d/1ahPELoUrj-w4MtwUY3tK9tL3FkpJBOSt2aIWa8dqQ9A/export?format=csv&gid=478926059';
+const SIMULATED_PORTFOLIO_URL = 'https://docs.google.com/spreadsheets/d/1ahPELoUrj-w4MtwUY3tK9tL3FkpJBOSt2aIWa8dqQ9A/export?format=csv&gid=1160230931';
 const PRICE_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
 const PASSWORD = '1234566';
 
@@ -33,6 +34,7 @@ const SystemSettings: React.FC = () => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [portfolioData, setPortfolioData] = useState<PortfolioItem[]>([]);
+  const [simulatedPortfolioData, setSimulatedPortfolioData] = useState<PortfolioItem[]>([]);
   const [watchlistData, setWatchlistData] = useState<WatchlistItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -146,20 +148,23 @@ const SystemSettings: React.FC = () => {
     setLoading(true);
     try {
       const timestamp = new Date().getTime();
-      const [portRes, watchRes, priceRes] = await Promise.all([
+      const [portRes, watchRes, simRes, priceRes] = await Promise.all([
         fetch(`${PORTFOLIO_URL}&t=${timestamp}`, { cache: 'no-store' }),
         fetch(`${WATCHLIST_URL}&t=${timestamp}`, { cache: 'no-store' }),
+        fetch(`${SIMULATED_PORTFOLIO_URL}&t=${timestamp}`, { cache: 'no-store' }),
         fetch(`${PRICE_DATA_URL}&t=${timestamp}`, { cache: 'no-store' })
       ]);
 
-      if (!portRes.ok || !watchRes.ok || !priceRes.ok) throw new Error('Lỗi kết nối dữ liệu');
+      if (!portRes.ok || !watchRes.ok || !simRes.ok || !priceRes.ok) throw new Error('Lỗi kết nối dữ liệu');
 
       const portCSV = await portRes.text();
       const watchCSV = await watchRes.text();
+      const simCSV = await simRes.text();
       const priceCSV = await priceRes.text();
 
       const portRows = parseCSV(portCSV).slice(2); 
       const watchlistRows = parseCSV(watchCSV).slice(2); 
+      const simRows = parseCSV(simCSV).slice(2);
       
       const priceRows = parseCSV(priceCSV).slice(1);
 
@@ -182,6 +187,43 @@ const SystemSettings: React.FC = () => {
           const liveData = priceMap.get(symbol) || { price: 0, change: 0 };
           const recPrice = cleanNumber(row[2]);
           const sellPrice = cleanNumber(row[4]); // Column E
+          const marketPrice = liveData.price;
+          
+          let profitPercent = 0;
+          if (recPrice > 0 && marketPrice > 0) {
+            profitPercent = ((marketPrice - recPrice) / recPrice) * 100;
+          }
+
+          let sellProfitPercent = 0;
+          if (recPrice > 0 && sellPrice > 0) {
+            sellProfitPercent = ((sellPrice - recPrice) / recPrice) * 100;
+          }
+
+          return {
+            symbol,
+            recDate: row[1],
+            recPrice,
+            sellPrice,
+            note: row[3],
+            marketPrice,
+            changePercent: liveData.change,
+            profitPercent,
+            sellProfitPercent,
+            holdingSessions: getBusinessDaysCount(row[1])
+          };
+        })
+        .sort((a, b) => {
+          return parseDateStr(b.recDate) - parseDateStr(a.recDate);
+        });
+
+      // Process Simulated Portfolio Data
+      const parsedSimulated: PortfolioItem[] = simRows
+        .filter(row => row[0] && row[0] !== '')
+        .map(row => {
+          const symbol = row[0].trim();
+          const liveData = priceMap.get(symbol) || { price: 0, change: 0 };
+          const recPrice = cleanNumber(row[2]);
+          const sellPrice = cleanNumber(row[4]);
           const marketPrice = liveData.price;
           
           let profitPercent = 0;
@@ -240,6 +282,7 @@ const SystemSettings: React.FC = () => {
         .sort((a, b) => a.proximityPercent - b.proximityPercent);
 
       setPortfolioData(parsedPortfolio);
+      setSimulatedPortfolioData(parsedSimulated);
       setWatchlistData(parsedWatchlist);
       setError(null);
     } catch (err) {
@@ -574,6 +617,70 @@ const SystemSettings: React.FC = () => {
                 <tr>
                   <td colSpan={6} className="px-6 py-20 text-center text-slate-300 font-black uppercase tracking-widest">
                     Chưa có dữ liệu tầm ngắm
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-16 mb-6">
+          <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight flex items-center gap-3">
+            <div className="w-2 h-6 bg-purple-500 rounded-full"></div>
+            DANH MỤC MUA MÔ PHỎNG
+          </h3>
+        </div>
+
+        <div className="overflow-x-auto rounded-3xl border border-slate-100 max-h-[600px] overflow-y-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-slate-50 text-slate-400 font-black uppercase tracking-wider shadow-sm">
+                <th className="px-6 py-5">Tên cổ phiếu</th>
+                <th className="px-6 py-5">Giá khuyến nghị</th>
+                <th className="px-6 py-5">Số phiên nắm giữ</th>
+                <th className="px-6 py-5">Giá thị trường</th>
+                <th className="px-6 py-5">% thay đổi trong phiên</th>
+                <th className="px-6 py-5">Lãi lỗ tạm tính</th>
+                <th className="px-6 py-5">Giá bán</th>
+                <th className="px-6 py-5">Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {simulatedPortfolioData.map((item, idx) => {
+                const profitColor = getPriceColor(item.profitPercent);
+                const changeColor = getPriceColor(item.changePercent);
+                
+                return (
+                  <tr key={`${item.symbol}-sim-${idx}`} className={`hover:bg-slate-50 transition-all group ${item.sellPrice > 0 ? 'opacity-60 grayscale-[0.2]' : ''}`}>
+                    <td className={`px-6 py-5 font-black ${profitColor}`}>{item.symbol}</td>
+                    <td className="px-6 py-5 font-bold text-slate-900">{item.recPrice.toLocaleString('vi-VN')}</td>
+                    <td className="px-6 py-5 font-black text-blue-600">{item.holdingSessions}</td>
+                    <td className={`px-6 py-5 font-black ${changeColor}`}>{item.marketPrice.toLocaleString('vi-VN')}</td>
+                    <td className={`px-6 py-5 font-black ${changeColor}`}>
+                      {item.changePercent > 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
+                    </td>
+                    <td className={`px-6 py-5 font-black ${profitColor}`}>
+                      {item.profitPercent > 0 ? '+' : ''}{item.profitPercent.toFixed(2)}%
+                    </td>
+                    <td className="px-6 py-5 font-bold text-slate-900">
+                      {item.sellPrice > 0 ? item.sellPrice.toLocaleString('vi-VN') : '-'}
+                    </td>
+                    <td className="px-6 py-5 text-slate-500 font-medium max-w-xs truncate">
+                      {item.sellPrice > 0 ? (
+                        <span className={`font-black ${item.sellProfitPercent >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {item.sellProfitPercent >= 0 ? 'CHỐT LÃI' : 'CẮT LỖ'} {item.sellProfitPercent > 0 ? '+' : ''}{item.sellProfitPercent.toFixed(2)}%
+                        </span>
+                      ) : (
+                        item.note
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {simulatedPortfolioData.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={8} className="px-6 py-20 text-center text-slate-300 font-black uppercase tracking-widest">
+                    Chưa có dữ liệu danh mục mô phỏng
                   </td>
                 </tr>
               )}

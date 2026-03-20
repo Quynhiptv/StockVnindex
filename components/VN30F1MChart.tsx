@@ -62,9 +62,9 @@ const VN30F1MChart: React.FC = () => {
         });
       }
 
-      const chartPoints: VN30F1MDataPoint[] = rows.slice(1)
+      const chartPoints: VN30F1MDataPoint[] = rows.slice(1, 30)
         .map(row => ({
-          date: row[0] || '',
+          date: row[8] || '',
           foreign: cleanNumeric(row[9]),
           proprietary: cleanNumeric(row[10])
         }))
@@ -135,28 +135,28 @@ const VN30F1MChart: React.FC = () => {
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart 
             data={data} 
-            margin={{ top: 30, right: 40, left: 10, bottom: 10 }}
+            margin={{ top: 30, right: 10, left: 10, bottom: 10 }}
           >
             <CartesianGrid strokeDasharray="6 6" stroke="#f1f5f9" vertical={true} />
             <XAxis 
               dataKey="date" 
-              tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: '900' }} 
+              tick={{ fill: '#94a3b8', fontSize: 7, fontWeight: '900' }} 
               axisLine={{ stroke: '#f1f5f9' }} 
               tickLine={false}
               interval={0}
-              angle={-45}
+              angle={-75}
               textAnchor="end"
-              height={80}
-              padding={{ left: 30, right: 30 }}
+              height={100}
+              padding={{ left: 5, right: 5 }}
             />
             <YAxis 
               orientation="right" 
               stroke="#94a3b8" 
-              fontSize={11} 
+              fontSize={10} 
               fontWeight="900" 
               axisLine={false} 
               tickLine={false} 
-              domain={['dataMin - 500', 'dataMax + 500']}
+              domain={['auto', 'auto']}
               tickFormatter={(val) => val.toLocaleString('vi-VN')}
             />
             <Tooltip
@@ -177,9 +177,9 @@ const VN30F1MChart: React.FC = () => {
               dataKey="foreign" 
               name="Khối ngoại"
               stroke="#3b82f6" 
-              strokeWidth={4} 
-              dot={{ r: 5, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }} 
-              activeDot={{ r: 8, fill: '#3b82f6', strokeWidth: 3, stroke: '#fff' }}
+              strokeWidth={2} 
+              dot={{ r: 2, fill: '#3b82f6', strokeWidth: 1, stroke: '#fff' }} 
+              activeDot={{ r: 5, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
               isAnimationActive={false}
               connectNulls={true}
             />
@@ -188,9 +188,9 @@ const VN30F1MChart: React.FC = () => {
               dataKey="proprietary" 
               name="Tự doanh"
               stroke="#f43f5e" 
-              strokeWidth={4} 
-              dot={{ r: 5, fill: '#f43f5e', strokeWidth: 2, stroke: '#fff' }} 
-              activeDot={{ r: 8, fill: '#f43f5e', strokeWidth: 3, stroke: '#fff' }}
+              strokeWidth={2} 
+              dot={{ r: 2, fill: '#f43f5e', strokeWidth: 1, stroke: '#fff' }} 
+              activeDot={{ r: 5, fill: '#f43f5e', strokeWidth: 2, stroke: '#fff' }}
               isAnimationActive={false}
               connectNulls={true}
             />
