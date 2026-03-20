@@ -13,8 +13,10 @@ interface VN30F1MDataPoint {
 interface HeaderInfo {
   foreignChange: string;
   foreignHolding: string;
+  foreignAvgPrice: string;
   propChange: string;
   propHolding: string;
+  propAvgPrice: string;
 }
 
 const cleanNumeric = (val: string): number | null => {
@@ -57,8 +59,10 @@ const VN30F1MChart: React.FC = () => {
         setHeader({
           foreignChange: rows[2][6] || '0',
           foreignHolding: rows[2][7] || '0',
+          foreignAvgPrice: rows[2][5] || '0',
           propChange: rows[3][6] || '0',
-          propHolding: rows[3][7] || '0'
+          propHolding: rows[3][7] || '0',
+          propAvgPrice: rows[3][5] || '0'
         });
       }
 
@@ -84,7 +88,7 @@ const VN30F1MChart: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const renderHeaderRow = (label: string, change: string, holding: string) => {
+  const renderHeaderRow = (label: string, change: string, holding: string, avgPrice: string) => {
     const changeVal = cleanNumeric(change);
     const isPositive = changeVal > 0;
     const prefix = isPositive ? 'Nâng ' : 'Hạ ';
@@ -92,13 +96,17 @@ const VN30F1MChart: React.FC = () => {
 
     return (
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm md:text-base">
-        <span className="font-bold text-slate-700">{label}:</span>
-        <span className={`font-black ${colorClass}`}>
+        <span className="font-bold text-slate-700 w-28">{label}:</span>
+        <span className={`font-black ${colorClass} min-w-[80px]`}>
           {prefix}{change}
         </span>
         <span className="text-slate-400">|</span>
+        <span className="font-bold text-slate-700 min-w-[180px]">
+          Nắm giữ: <span className="text-blue-600 font-black">{holding} HĐ</span>
+        </span>
+        <span className="text-slate-400">|</span>
         <span className="font-bold text-slate-700">
-          Nắm giữ qua ngày: <span className="text-blue-600 font-black">{holding} Hợp đồng</span>
+          Giá TB: <span className="text-slate-900 font-black">{avgPrice}</span>
         </span>
       </div>
     );
@@ -125,8 +133,8 @@ const VN30F1MChart: React.FC = () => {
         
         {header && (
           <div className="flex flex-col gap-3 px-6 py-5 bg-slate-50 rounded-[1.5rem] border border-slate-100">
-            {renderHeaderRow('Khối ngoại', header.foreignChange, header.foreignHolding)}
-            {renderHeaderRow('Khối Tự doanh', header.propChange, header.propHolding)}
+            {renderHeaderRow('Khối ngoại', header.foreignChange, header.foreignHolding, header.foreignAvgPrice)}
+            {renderHeaderRow('Khối Tự doanh', header.propChange, header.propHolding, header.propAvgPrice)}
           </div>
         )}
       </div>

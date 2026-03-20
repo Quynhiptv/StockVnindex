@@ -328,11 +328,15 @@ const MarketOverview: React.FC = () => {
               </div>
             </div>
           </div>
-          <button onClick={fetchData} disabled={loading} className="group flex items-center justify-center gap-3 px-8 py-3.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-2xl shadow-sm transition-all active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 text-blue-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button 
+            onClick={fetchData} 
+            disabled={loading} 
+            className="group flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl shadow-sm transition-all active:scale-95"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 text-blue-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span className="text-[12px] font-black text-slate-800 uppercase tracking-widest">LÀM MỚI</span>
+            <span className="text-[11px] font-black text-slate-800 uppercase tracking-widest">LÀM MỚI</span>
           </button>
         </div>
       </div>
