@@ -51,10 +51,12 @@ const StockList: React.FC = () => {
 
   const checkAlerts = () => {
     const now = new Date();
-    const hour = now.getHours();
-    const today = now.toLocaleDateString();
+    // Chuyển đổi sang múi giờ Việt Nam (GMT+7)
+    const vnTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+    const hour = vnTime.getHours();
+    const today = vnTime.toLocaleDateString('vi-VN');
     
-    // Chỉ gửi trong khung giờ từ 9h00 - 15h00 hàng ngày
+    // Chỉ gửi trong khung giờ từ 9h00 - 15h00 hàng ngày theo giờ VN
     if (hour < 9 || hour >= 15) return;
 
     data.forEach(stock => {
@@ -65,18 +67,17 @@ const StockList: React.FC = () => {
       const isBuy = stock.currentPrice > 0 && stock.exploratoryPrice > 0 && stock.currentPrice <= (stock.exploratoryPrice + 0.05);
 
       if (isBuy) {
-        handleAlert(stock, 'buy');
+        handleAlert(stock, 'buy', today);
       } else if (isWatch) {
-        handleAlert(stock, 'watch');
+        handleAlert(stock, 'watch', today);
       }
     });
   };
 
-  const handleAlert = (stock: StockListItem, type: 'watch' | 'buy') => {
+  const handleAlert = (stock: StockListItem, type: 'watch' | 'buy', today: string) => {
     const key = `${stock.symbol}_${type}`;
     const history = alertHistory.current[key];
     const now = Date.now();
-    const today = new Date().toLocaleDateString();
 
     if (!history || history.date !== today) {
       sendAlert(stock, type);
