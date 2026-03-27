@@ -196,7 +196,7 @@ const handleAlert = async (stock: StockListItem, type: 'watch' | 'buy', today: s
 };
 
 // Chạy kiểm tra mỗi 1 phút
-setInterval(checkAlerts, 60000);
+// setInterval(checkAlerts, 60000);
 
 async function startServer() {
   const app = express();
@@ -224,7 +224,7 @@ async function startServer() {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
     // Chạy kiểm tra lần đầu khi khởi động
-    checkAlerts();
+    // checkAlerts();
   });
 }
 
