@@ -14,6 +14,9 @@ interface StockPriceInfo {
   changePercent: number;
 }
 
+const RECOMMENDATIONS_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=2082559901';
+const PRICE_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
+
 const RecommendationPortfolio: React.FC = () => {
   const [recommendations, setRecommendations] = useState<RecommendationData[]>([]);
   const [priceData, setPriceData] = useState<Record<string, StockPriceInfo>>({});
@@ -21,6 +24,49 @@ const RecommendationPortfolio: React.FC = () => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [selectedGroup, setSelectedGroup] = useState<string>('Tất cả');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const parseCSV = (csv: string) => {
+    return csv.split('\n').map(row => {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let char of row) {
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    });
+  };
+
+  const cleanNumber = (val: string): number => {
+    if (!val || val === '-' || val === '' || val === '#N/A' || val === '#VALUE!') return 0;
+    let s = val.trim().replace('%', '');
+    const commaCount = (s.match(/,/g) || []).length;
+    const dotCount = (s.match(/\./g) || []).length;
+
+    if (commaCount > 0 && dotCount > 0) {
+      if (s.indexOf('.') < s.indexOf(',')) {
+        s = s.replace(/\./g, '').replace(',', '.');
+      } else {
+        s = s.replace(/,/g, '');
+      }
+    } else if (commaCount > 1) {
+      s = s.replace(/,/g, '');
+    } else if (dotCount > 1) {
+      s = s.replace(/\./g, '');
+    } else if (commaCount === 1) {
+      s = s.replace(',', '.');
+    }
+    const num = parseFloat(s);
+    return isNaN(num) ? 0 : num;
+  };
 
   const handleFilterToday = () => {
     if (recommendations.length === 0) return;
@@ -108,43 +154,44 @@ const RecommendationPortfolio: React.FC = () => {
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (isManual = false) => {
+    if (isManual) setRefreshing(true);
     try {
       const timestamp = Date.now();
       // Fetch Recommendations
-      const recResponse = await fetch(`https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/gviz/tq?tqx=out:csv&gid=2082559901&t=${timestamp}`, { cache: 'no-store' });
+      const recResponse = await fetch(`${RECOMMENDATIONS_URL}&t=${timestamp}`, { cache: 'no-store' });
       const recCsvText = await recResponse.text();
       
       // Fetch Price Data
-      const priceResponse = await fetch(`https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/gviz/tq?tqx=out:csv&gid=1628670680&t=${timestamp}`, { cache: 'no-store' });
+      const priceResponse = await fetch(`${PRICE_DATA_URL}&t=${timestamp}`, { cache: 'no-store' });
       const priceCsvText = await priceResponse.text();
 
       // Parse Price CSV
-      const priceRows = priceCsvText.split('\n').filter(row => row.trim() !== '');
+      const priceRows = parseCSV(priceCsvText);
       const priceMap: Record<string, StockPriceInfo> = {};
       priceRows.slice(1).forEach(row => {
-        const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/^"|"$/g, '').trim());
-        if (cols.length >= 3) {
-          const symbol = cols[0].toUpperCase();
-          priceMap[symbol] = {
-            symbol,
-            currentPrice: parseFloat(cols[1].replace(',', '.')) || 0,
-            changePercent: parseFloat(cols[2].replace(',', '.')) || 0
-          };
+        if (row.length >= 3) {
+          const symbol = row[0]?.toUpperCase().trim();
+          if (symbol) {
+            priceMap[symbol] = {
+              symbol,
+              currentPrice: cleanNumber(row[1]),
+              changePercent: cleanNumber(row[2])
+            };
+          }
         }
       });
       setPriceData(priceMap);
 
       // Parse Recommendations CSV
-      const recRows = recCsvText.split('\n').filter(row => row.trim() !== '');
+      const recRows = parseCSV(recCsvText);
       const parsedRecs: RecommendationData[] = recRows.slice(1).map(row => {
-        const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/^"|"$/g, '').trim());
-        if (cols.length < 4) return null;
+        if (row.length < 4 || !row[0]) return null;
         return {
-          group: cols[0],
-          date: cols[1],
-          symbol: cols[2].toUpperCase(),
-          recommendedPrice: parseFloat(cols[3].replace(',', '.')) || 0
+          group: row[0],
+          date: row[1],
+          symbol: row[2].toUpperCase().trim(),
+          recommendedPrice: cleanNumber(row[3])
         };
       }).filter((item): item is RecommendationData => item !== null);
 
@@ -156,6 +203,8 @@ const RecommendationPortfolio: React.FC = () => {
     } catch (error) {
       console.error('Error fetching recommendation data:', error);
       setLoading(false);
+    } finally {
+      if (isManual) setTimeout(() => setRefreshing(false), 500);
     }
   };
 
@@ -187,14 +236,6 @@ const RecommendationPortfolio: React.FC = () => {
         const itemDate = parseDate(item.date);
         return itemDate >= start && itemDate <= end;
       });
-    } else {
-      // Default: Only show recommendations within the last 10 trading days (T+0 to T+10)
-      filtered = filtered.filter(item => {
-        const tStatus = calculateTPrefix(item.date);
-        if (tStatus === 'T+?') return false;
-        const tValue = parseInt(tStatus.replace('T+', ''));
-        return tValue >= 0 && tValue <= 10;
-      });
     }
 
     return filtered;
@@ -218,6 +259,21 @@ const RecommendationPortfolio: React.FC = () => {
           <p className="text-slate-500 text-sm font-medium mt-1 italic">Đây là thông tin mang giá trị tham khảo</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+             <div className="flex flex-col items-end">
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Auto refresh</span>
+                <span className="text-[10px] font-bold text-emerald-600 mt-1">LÀM MỚI SAU 5S</span>
+             </div>
+             <button 
+              onClick={() => fetchData(true)} 
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-black shadow-lg shadow-blue-200 transition-all active:scale-95"
+             >
+                <svg xmlns="http://www.w3.org/2000/svg" className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                LÀM MỚI
+              </button>
+          </div>
           <div className="flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 shadow-sm">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lọc Nhóm:</span>
             <select 
