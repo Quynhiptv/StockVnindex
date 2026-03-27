@@ -19,7 +19,7 @@ const ATCForeign: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const parseCSV = (csv: string) => {
-    return csv.split('\n').map(row => {
+    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
       const result = [];
       let current = '';
       let inQuotes = false;
@@ -123,8 +123,8 @@ const ATCForeign: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {list.map((item) => (
-              <tr key={item.symbol} className="hover:bg-slate-50 transition-colors group">
+            {list.map((item, index) => (
+              <tr key={`${item.symbol}-${index}`} className="hover:bg-slate-50 transition-colors group">
                 <td className="px-5 py-4 font-black text-slate-800 transition-all duration-500">{item.symbol}</td>
                 <td className="px-5 py-4 text-right font-black text-slate-500 transition-all duration-500">{item.klAtc.toLocaleString('vi-VN')}</td>
                 <td className={`px-5 py-4 text-right font-black transition-all duration-500 ${item.klDong < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{item.klDong.toLocaleString('vi-VN')} CP</td>

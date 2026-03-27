@@ -342,7 +342,7 @@ const MarketOverview: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-        {indices.map((item) => <IndexCard key={item.name} data={item} />)}
+        {indices.map((item, index) => <IndexCard key={`${item.name}-${index}`} data={item} />)}
       </div>
 
       <div className="flex flex-col gap-16 md:gap-24">

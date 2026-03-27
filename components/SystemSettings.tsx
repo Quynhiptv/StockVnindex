@@ -48,7 +48,7 @@ const SystemSettings: React.FC = () => {
   } | null>(null);
 
   const parseCSV = (csv: string) => {
-    return csv.split('\n').map(row => {
+    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
       const result = [];
       let current = '';
       let inQuotes = false;

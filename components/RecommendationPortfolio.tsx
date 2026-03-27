@@ -25,9 +25,10 @@ const RecommendationPortfolio: React.FC = () => {
   const [endDate, setEndDate] = useState<string>('');
   const [selectedGroup, setSelectedGroup] = useState<string>('Tất cả');
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
 
   const parseCSV = (csv: string) => {
-    return csv.split('\n').map(row => {
+    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
       const result = [];
       let current = '';
       let inQuotes = false;
@@ -199,6 +200,7 @@ const RecommendationPortfolio: React.FC = () => {
       parsedRecs.sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
       setRecommendations(parsedRecs);
+      setLastUpdated(new Date().toLocaleTimeString('vi-VN'));
       setLoading(false);
     } catch (error) {
       console.error('Error fetching recommendation data:', error);
@@ -259,6 +261,12 @@ const RecommendationPortfolio: React.FC = () => {
           <p className="text-slate-500 text-sm font-medium mt-1 italic">Đây là thông tin mang giá trị tham khảo</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
+          {lastUpdated && (
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+              <span className="text-[9px] font-black uppercase tracking-widest">{lastUpdated}</span>
+            </div>
+          )}
           <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
              <div className="flex flex-col items-end">
                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Auto refresh</span>

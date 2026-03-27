@@ -146,7 +146,7 @@ const StockList: React.FC = () => {
   }, [data]);
 
   const parseCSV = (csv: string) => {
-    return csv.split('\n').map(row => {
+    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
       const result = [];
       let current = '';
       let inQuotes = false;
@@ -389,7 +389,7 @@ const StockList: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {sortedData.map((stock) => {
+              {sortedData.map((stock, index) => {
                 const minZone = Math.min(stock.zone1, stock.zone2);
                 const maxZone = Math.max(stock.zone1, stock.zone2);
                 
@@ -402,7 +402,7 @@ const StockList: React.FC = () => {
                 const trendColor = getTrendColor(stock.changePercent);
 
                 return (
-                  <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors group">
+                  <tr key={`${stock.symbol}-${index}`} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-6 py-5 font-black text-slate-900 transition-all duration-500">{stock.symbol}</td>
                     
                     <td className={`px-6 py-5 font-bold transition-all duration-500 ${isPriceInZone ? 'animate-blink-yellow text-amber-700' : 'text-slate-500'}`}>

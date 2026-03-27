@@ -70,7 +70,7 @@ const BullBearAction: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   const parseCSV = (csv: string) => {
-    return csv.split('\n').map(row => {
+    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
       const result = [];
       let current = '';
       let inQuotes = false;
@@ -193,7 +193,7 @@ const BullBearAction: React.FC = () => {
               <TableHeader />
               <tbody className="divide-y divide-slate-50">
                 {highestClosing.length > 0 ? (
-                  highestClosing.map(stock => <StockRow key={stock.symbol} stock={stock} />)
+                  highestClosing.map((stock, index) => <StockRow key={`${stock.symbol}-${index}`} stock={stock} />)
                 ) : (
                   <tr><td colSpan={5} className="py-20 text-center text-slate-400 font-black uppercase">Không có dữ liệu</td></tr>
                 )}
@@ -211,7 +211,7 @@ const BullBearAction: React.FC = () => {
               <TableHeader />
               <tbody className="divide-y divide-slate-50">
                 {lowestClosing.length > 0 ? (
-                  lowestClosing.map(stock => <StockRow key={stock.symbol} stock={stock} />)
+                  lowestClosing.map((stock, index) => <StockRow key={`${stock.symbol}-${index}`} stock={stock} />)
                 ) : (
                   <tr><td colSpan={5} className="py-20 text-center text-slate-400 font-black uppercase">Không có dữ liệu</td></tr>
                 )}

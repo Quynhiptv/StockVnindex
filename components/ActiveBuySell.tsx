@@ -227,7 +227,7 @@ const ActiveBuySell: React.FC = () => {
             <table className="w-full text-left">
               <TableHeader />
               <tbody className="divide-y divide-slate-50">
-                {buyList.map(item => <StockRow key={item.symbol} item={item} />)}
+                {buyList.map((item, index) => <StockRow key={`${item.symbol}-${index}`} item={item} />)}
                 {buyList.length === 0 && (
                   <tr><td colSpan={6} className="py-24 text-center text-slate-300 font-black uppercase tracking-widest">Không có dữ liệu</td></tr>
                 )}
@@ -247,7 +247,7 @@ const ActiveBuySell: React.FC = () => {
             <table className="w-full text-left">
               <TableHeader />
               <tbody className="divide-y divide-slate-50">
-                {sellList.map(item => <StockRow key={item.symbol} item={item} />)}
+                {sellList.map((item, index) => <StockRow key={`${item.symbol}-${index}`} item={item} />)}
                 {sellList.length === 0 && (
                   <tr><td colSpan={6} className="py-24 text-center text-slate-300 font-black uppercase tracking-widest">Không có dữ liệu</td></tr>
                 )}

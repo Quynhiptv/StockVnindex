@@ -22,7 +22,7 @@ const ForeignFlow: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const parseCSV = (csv: string) => {
-    return csv.split('\n').map(row => {
+    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
       const result = [];
       let current = '';
       let inQuotes = false;
@@ -216,8 +216,8 @@ const ForeignFlow: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {topBuy.map((stock) => (
-                  <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors group">
+                {topBuy.map((stock, index) => (
+                  <tr key={`${stock.symbol}-${index}`} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-5 py-4 font-black text-slate-800 transition-all duration-500">{stock.symbol}</td>
                     <td className="px-5 py-4 text-right font-black text-emerald-600 transition-all duration-500">{stock.netValue.toFixed(1)}</td>
                     <td className="px-5 py-4 text-right text-slate-500 font-bold transition-all duration-500">{stock.avgPrice}</td>
@@ -253,8 +253,8 @@ const ForeignFlow: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {topSell.map((stock) => (
-                  <tr key={stock.symbol} className="hover:bg-slate-50 transition-colors group">
+                {topSell.map((stock, index) => (
+                  <tr key={`${stock.symbol}-${index}`} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-5 py-4 font-black text-slate-800 transition-all duration-500">{stock.symbol}</td>
                     <td className="px-5 py-4 text-right font-black text-rose-600 transition-all duration-500">{Math.abs(stock.netValue).toFixed(1)}</td>
                     <td className="px-5 py-4 text-right text-slate-500 font-bold transition-all duration-500">{stock.avgPrice}</td>

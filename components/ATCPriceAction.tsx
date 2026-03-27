@@ -226,7 +226,7 @@ const ATCPriceAction: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {kéoList.length > 0 ? (
-                  kéoList.map(item => <StockRow key={item.symbol} item={item} />)
+                  kéoList.map((item, index) => <StockRow key={`${item.symbol}-${index}`} item={item} />)
                 ) : (
                   <tr><td colSpan={4} className="py-20 text-center text-slate-300 font-black uppercase">Không có mã nào được kéo</td></tr>
                 )}
@@ -255,7 +255,7 @@ const ATCPriceAction: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {đạpList.length > 0 ? (
-                  đạpList.map(item => <StockRow key={item.symbol} item={item} />)
+                  đạpList.map((item, index) => <StockRow key={`${item.symbol}-${index}`} item={item} />)
                 ) : (
                   <tr><td colSpan={4} className="py-20 text-center text-slate-300 font-black uppercase">Không có mã nào bị đạp</td></tr>
                 )}

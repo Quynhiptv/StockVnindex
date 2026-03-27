@@ -66,7 +66,7 @@ const VolumeSurge: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const parseCSV = (csv: string) => {
-    return csv.split('\n').map(row => {
+    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
       const result = [];
       let current = '';
       let inQuotes = false;
@@ -186,7 +186,7 @@ const VolumeSurge: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {gainers.length > 0 ? (
-                  gainers.map(stock => <StockRow key={stock.symbol} stock={stock} />)
+                  gainers.map((stock, index) => <StockRow key={`${stock.symbol}-${index}`} stock={stock} />)
                 ) : (
                   <tr><td colSpan={5} className="py-20 text-center text-slate-400 font-black uppercase">Không có dữ liệu</td></tr>
                 )}
@@ -213,7 +213,7 @@ const VolumeSurge: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {losers.length > 0 ? (
-                  losers.map(stock => <StockRow key={stock.symbol} stock={stock} />)
+                  losers.map((stock, index) => <StockRow key={`${stock.symbol}-${index}`} stock={stock} />)
                 ) : (
                   <tr><td colSpan={5} className="py-20 text-center text-slate-400 font-black uppercase">Không có dữ liệu</td></tr>
                 )}
