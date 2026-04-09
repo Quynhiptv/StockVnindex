@@ -77,15 +77,15 @@ const IndexCard: React.FC<{ data: MarketIndexData }> = ({ data }) => {
   return (
     <div className={`${bgColor} border-2 ${borderColor} rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden`}>
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-black text-white uppercase tracking-tighter">{data.name}</h3>
-        <div className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase shadow-sm ${badgeColor}`}>
+        <h3 className="text-3xl font-black text-white uppercase tracking-tighter">{data.name}</h3>
+        <div className={`px-3 py-1.5 rounded-xl text-[16px] font-black uppercase shadow-sm ${badgeColor}`}>
           {data.changePoints} ({ensurePercent(data.changePercent)})
         </div>
       </div>
 
       <div className="mb-4">
-        <div className={`text-4xl sm:text-5xl font-black ${priceColor} tracking-tighter leading-none tabular-nums transition-all duration-500`}>{data.price}</div>
-        <div className="text-white/90 text-[10px] font-black mt-3 bg-white/10 inline-block px-4 py-1.5 rounded-full uppercase border border-white/20 shadow-sm transition-all duration-500">
+        <div className={`text-6xl sm:text-7xl font-black ${priceColor} tracking-tighter leading-none tabular-nums transition-all duration-500`}>{data.price}</div>
+        <div className="text-white/90 text-[15px] font-black mt-3 bg-white/10 inline-block px-4 py-1.5 rounded-full uppercase border border-white/20 shadow-sm transition-all duration-500">
           GTGD: {formattedValue}
         </div>
       </div>
@@ -93,43 +93,43 @@ const IndexCard: React.FC<{ data: MarketIndexData }> = ({ data }) => {
       {/* Stock Counts Section */}
       <div className="grid grid-cols-5 gap-1 mb-6 bg-black/5 rounded-2xl p-3 border border-white/10">
         <div className="text-center">
-          <p className="text-[9px] text-purple-200 font-black uppercase mb-1">Trần</p>
-          <p className="text-sm font-black text-purple-300">{data.ceiling}</p>
+          <p className="text-[14px] text-purple-200 font-black uppercase mb-1">Trần</p>
+          <p className="text-xl font-black text-purple-300">{data.ceiling}</p>
         </div>
         <div className="text-center">
-          <p className="text-[9px] text-emerald-200 font-black uppercase mb-1">Tăng</p>
-          <p className="text-sm font-black text-emerald-300">{data.up}</p>
+          <p className="text-[14px] text-emerald-200 font-black uppercase mb-1">Tăng</p>
+          <p className="text-xl font-black text-emerald-300">{data.up}</p>
         </div>
         <div className="text-center">
-          <p className="text-[9px] text-amber-100 font-black uppercase mb-1">Tham chiếu</p>
-          <p className="text-sm font-black text-amber-200">{data.unchanged}</p>
+          <p className="text-[14px] text-amber-100 font-black uppercase mb-1">Tham chiếu</p>
+          <p className="text-xl font-black text-amber-200">{data.unchanged}</p>
         </div>
         <div className="text-center">
-          <p className="text-[9px] text-rose-200 font-black uppercase mb-1">Giảm</p>
-          <p className="text-sm font-black text-rose-300">{data.down}</p>
+          <p className="text-[14px] text-rose-200 font-black uppercase mb-1">Giảm</p>
+          <p className="text-xl font-black text-rose-300">{data.down}</p>
         </div>
         <div className="text-center">
-          <p className="text-[9px] text-cyan-200 font-black uppercase mb-1">Sàn</p>
-          <p className="text-sm font-black text-cyan-300">{data.floor}</p>
+          <p className="text-[14px] text-cyan-200 font-black uppercase mb-1">Sàn</p>
+          <p className="text-xl font-black text-cyan-300">{data.floor}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-4 pt-4 border-t border-white/20 bg-white/90 rounded-b-[1.5rem] -mx-6 -mb-6 p-6">
         <div>
-          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">RSI (14)</p>
-          <p className="text-lg font-black text-slate-800 tabular-nums transition-all duration-500">{data.rsi}</p>
+          <p className="text-[15px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">RSI (14)</p>
+          <p className="text-2xl font-black text-slate-800 tabular-nums transition-all duration-500">{data.rsi}</p>
         </div>
         <div>
-          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">CÁCH MA20</p>
-          <p className="text-lg font-black text-slate-800 tabular-nums transition-all duration-500">{ensurePercent(data.ma20)}</p>
+          <p className="text-[15px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">CÁCH MA20</p>
+          <p className="text-2xl font-black text-slate-800 tabular-nums transition-all duration-500">{ensurePercent(data.ma20)}</p>
         </div>
         <div>
-          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">VOL / QUA</p>
-          <p className="text-lg font-black text-slate-800 tabular-nums transition-all duration-500">{ensurePercent(data.volYesterday)}</p>
+          <p className="text-[15px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">VOL / QUA</p>
+          <p className="text-2xl font-black text-slate-800 tabular-nums transition-all duration-500">{ensurePercent(data.volYesterday)}</p>
         </div>
         <div>
-          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">VOL / TB20</p>
-          <p className="text-lg font-black text-slate-800 tabular-nums transition-all duration-500">{ensurePercent(data.volAvg20)}</p>
+          <p className="text-[15px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">VOL / TB20</p>
+          <p className="text-2xl font-black text-slate-800 tabular-nums transition-all duration-500">{ensurePercent(data.volAvg20)}</p>
         </div>
       </div>
     </div>
@@ -153,7 +153,7 @@ const MomentumChart: React.FC<{ title: string; data: MomentumPoint[] }> = ({ tit
     <div className="bg-white border border-slate-200 rounded-[2.5rem] p-6 sm:p-10 lg:p-14 shadow-sm relative overflow-hidden group">
       <div className="flex items-center gap-3 mb-10">
         <div className="w-2 h-8 bg-blue-600 rounded-full shadow-lg shadow-blue-100"></div>
-        <h3 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight">{title}</h3>
+        <h3 className="text-3xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">{title}</h3>
       </div>
       
       <div className="w-full relative h-[350px] sm:h-[450px] lg:h-[550px]">
@@ -223,15 +223,15 @@ const MomentumChart: React.FC<{ title: string; data: MomentumPoint[] }> = ({ tit
       <div className="mt-12 flex flex-wrap justify-center items-center gap-6 px-6 py-5 bg-slate-50 rounded-[2rem] border border-slate-100">
            <div className="flex items-center gap-2.5">
              <div className="w-3.5 h-3.5 rounded-full bg-emerald-600 border border-white"></div>
-             <span className="text-[11px] text-slate-800 font-black uppercase">XU THẾ TĂNG</span>
+             <span className="text-[16px] text-slate-800 font-black uppercase">XU THẾ TĂNG</span>
            </div>
            <div className="flex items-center gap-2.5">
              <div className="w-3.5 h-3.5 rounded-full bg-rose-600 border border-white"></div>
-             <span className="text-[11px] text-slate-800 font-black uppercase">XU THẾ GIẢM</span>
+             <span className="text-[16px] text-slate-800 font-black uppercase">XU THẾ GIẢM</span>
            </div>
            <div className="flex items-center gap-2.5">
              <div className="w-3.5 h-3.5 rounded-full bg-amber-500 border border-white"></div>
-             <span className="text-[11px] text-slate-800 font-black uppercase">ĐI NGANG</span>
+             <span className="text-[16px] text-slate-800 font-black uppercase">ĐI NGANG</span>
            </div>
       </div>
     </div>
@@ -388,13 +388,13 @@ const MarketOverview: React.FC = () => {
               </svg>
             </div>
             <div>
-              <h2 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tighter leading-none uppercase">CHỈ SỐ THỊ TRƯỜNG</h2>
+              <h2 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter leading-none uppercase">CHỈ SỐ THỊ TRƯỜNG</h2>
               <div className="flex items-center gap-3 mt-2">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">DÒNG TIỀN & ĐỘNG LƯỢNG THỰC THỜI</p>
+                <p className="text-[15px] font-black text-slate-400 uppercase tracking-[0.25em]">DÒNG TIỀN & ĐỘNG LƯỢNG THỰC THỜI</p>
                 {lastUpdated && (
                   <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100">
                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                    <span className="text-[9px] font-black uppercase tracking-widest">{lastUpdated}</span>
+                    <span className="text-[14px] font-black uppercase tracking-widest">{lastUpdated}</span>
                   </div>
                 )}
               </div>
@@ -408,7 +408,7 @@ const MarketOverview: React.FC = () => {
             <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 text-blue-600 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span className="text-[11px] font-black text-slate-800 uppercase tracking-widest">LÀM MỚI</span>
+            <span className="text-[16px] font-black text-slate-800 uppercase tracking-widest">LÀM MỚI</span>
           </button>
         </div>
       </div>

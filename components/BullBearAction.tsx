@@ -18,7 +18,7 @@ const getPriceColor = (change: number) => {
 
 const TableHeader: React.FC = () => (
   <thead>
-    <tr className="text-slate-400 text-[10px] font-black uppercase tracking-wider border-b border-slate-100">
+    <tr className="text-slate-400 text-[15px] font-black uppercase tracking-wider border-b border-slate-100">
       <th className="px-5 py-4 text-left">Mã</th>
       <th className="px-5 py-4 text-right">Giá TT</th>
       <th className="px-5 py-4 text-right">% Đổi</th>
@@ -29,12 +29,12 @@ const TableHeader: React.FC = () => (
 
 const StockRow: React.FC<{ stock: BullBearStock }> = ({ stock }) => (
   <tr className="border-b border-slate-50 hover:bg-slate-50 transition-colors group">
-    <td className={`px-5 py-4 font-black text-xs transition-all duration-500 ${getPriceColor(stock.changePercent)}`}>{stock.symbol}</td>
-    <td className="px-5 py-4 text-right font-black text-xs text-slate-900 transition-all duration-500">{stock.price.toLocaleString('vi-VN')}</td>
-    <td className={`px-5 py-4 text-right font-black text-xs transition-all duration-500 ${getPriceColor(stock.changePercent)}`}>
+    <td className={`px-5 py-4 font-black text-lg transition-all duration-500 ${getPriceColor(stock.changePercent)}`}>{stock.symbol}</td>
+    <td className="px-5 py-4 text-right font-black text-lg text-slate-900 transition-all duration-500">{stock.price.toLocaleString('vi-VN')}</td>
+    <td className={`px-5 py-4 text-right font-black text-lg transition-all duration-500 ${getPriceColor(stock.changePercent)}`}>
       {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
     </td>
-    <td className="px-5 py-4 text-right font-bold text-xs text-slate-400 transition-all duration-500">{stock.volume.toLocaleString('vi-VN')} CP</td>
+    <td className="px-5 py-4 text-right font-bold text-lg text-slate-400 transition-all duration-500">{stock.volume.toLocaleString('vi-VN')} CP</td>
   </tr>
 );
 
@@ -106,8 +106,8 @@ const BullBearAction: React.FC = () => {
           </div>
           <div className="space-y-3 flex-grow">
             <div>
-              <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Cập nhật những cổ phiếu có tín hiệu đóng nến</h2>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic mt-1">
+              <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Cập nhật những cổ phiếu có tín hiệu đóng nến</h2>
+              <p className="text-[15px] font-black text-slate-400 uppercase tracking-[0.2em] italic mt-1">
                 Dữ liệu được cập nhật tự động intraday trong phiên
               </p>
             </div>

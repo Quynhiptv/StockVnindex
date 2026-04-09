@@ -114,14 +114,14 @@ const App: React.FC = () => {
         <div className="mb-8 md:mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
                 <div className="w-2 h-10 bg-blue-600 rounded-full shrink-0 shadow-lg shadow-blue-200"></div>
-                <h2 className="text-2xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">
+                <h2 className="text-4xl md:text-6xl font-black text-slate-900 uppercase tracking-tight">
                     {activeTab}
                 </h2>
             </div>
             
             <div className="flex items-center gap-3 px-5 py-2 bg-slate-100/80 backdrop-blur-sm border border-slate-200 rounded-full shadow-sm self-start sm:self-auto transition-all hover:bg-slate-200/80">
                 <div className={`w-2 h-2 rounded-full ${marketStatus.isOpen ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500'}`}></div>
-                <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest leading-none">
+                <span className="text-[16px] font-black text-slate-600 uppercase tracking-widest leading-none">
                     {marketStatus.text}
                 </span>
             </div>
@@ -135,10 +135,10 @@ const App: React.FC = () => {
       <footer className="mt-20 container mx-auto px-4 text-center border-t border-slate-200 pt-12">
          <div className="flex flex-col items-center gap-4">
            <div className="w-10 h-1 bg-slate-200 rounded-full mb-2"></div>
-           <p className="text-slate-400 text-[11px] font-black tracking-[0.3em] uppercase">
+           <p className="text-slate-400 text-[16px] font-black tracking-[0.3em] uppercase">
             © 2020 Đoàn Quỳnh Team • Hệ thống phân tích chứng khoán chuyên nghiệp
            </p>
-           <p className="text-slate-300 text-[10px] italic">Dữ liệu được cập nhật từ các nguồn uy tín nhất thị trường</p>
+           <p className="text-slate-300 text-[15px] italic">Dữ liệu được cập nhật từ các nguồn uy tín nhất thị trường</p>
          </div>
       </footer>
     </div>

@@ -68,7 +68,7 @@ const TopVolatility: React.FC = () => {
       <div className="overflow-x-auto flex-grow">
         <table className="w-full text-left border-collapse">
           <thead className="sticky top-0 bg-white shadow-sm z-10">
-            <tr className="text-slate-400 text-[11px] font-black uppercase tracking-widest border-b border-slate-100">
+            <tr className="text-slate-400 text-[16px] font-black uppercase tracking-widest border-b border-slate-100">
               <th className="px-6 py-4">Tên Cổ phiếu</th>
               <th className="px-6 py-4 text-right">Giá hiện tại</th>
               <th className="px-6 py-4 text-right">% Thay đổi</th>
@@ -80,17 +80,17 @@ const TopVolatility: React.FC = () => {
               const colorClass = getPriceColor(stock.phan_tram_thay_doi);
               return (
                 <tr key={`${stock.symbol}-${index}`} className="hover:bg-slate-50 transition-colors group">
-                  <td className={`px-6 py-4 font-black uppercase tracking-tight ${colorClass}`}>
+                  <td className={`px-6 py-4 font-black uppercase tracking-tight text-lg ${colorClass}`}>
                     {stock.symbol}
                   </td>
-                  <td className={`px-6 py-4 text-right font-mono font-bold ${colorClass}`}>
+                  <td className={`px-6 py-4 text-right font-mono font-bold text-lg ${colorClass}`}>
                     {stock.close_price?.toLocaleString('vi-VN')}
                   </td>
-                  <td className={`px-6 py-4 text-right font-mono font-black ${colorClass}`}>
+                  <td className={`px-6 py-4 text-right font-mono font-black text-lg ${colorClass}`}>
                     {stock.phan_tram_thay_doi > 0 ? '+' : ''}
                     {stock.phan_tram_thay_doi?.toFixed(2)}%
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-slate-500 font-medium">
+                  <td className="px-6 py-4 text-right font-mono text-slate-500 font-medium text-lg">
                     {stock.tong_klgd_x10?.toLocaleString('vi-VN')} CP
                   </td>
                 </tr>
@@ -115,7 +115,7 @@ const TopVolatility: React.FC = () => {
     <div className="space-y-10 animate-fadeIn pb-12">
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-2xl md:text-4xl font-black text-slate-900 uppercase tracking-tight">
+          <h2 className="text-4xl md:text-6xl font-black text-slate-900 uppercase tracking-tight">
             TOP CỔ PHIẾU BIẾN ĐỘNG TRONG PHIÊN
           </h2>
           <div className="flex flex-wrap items-center gap-4 mt-3">

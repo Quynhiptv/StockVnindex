@@ -257,8 +257,8 @@ const RecommendationPortfolio: React.FC = () => {
       {/* Header Info */}
       <div className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Cập nhật danh sách các mã cổ phiếu của 1 số nhóm</h3>
-          <p className="text-slate-500 text-sm font-medium mt-1 italic">Đây là thông tin mang giá trị tham khảo</p>
+          <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Cập nhật danh sách các mã cổ phiếu của 1 số nhóm</h3>
+          <p className="text-slate-500 text-lg font-medium mt-1 italic">Đây là thông tin mang giá trị tham khảo</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           {lastUpdated && (
@@ -317,7 +317,7 @@ const RecommendationPortfolio: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">Tổng hợp cổ phiếu khuyến nghị</h4>
+            <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Tổng hợp cổ phiếu khuyến nghị</h4>
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
@@ -369,14 +369,14 @@ const RecommendationPortfolio: React.FC = () => {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 z-10 bg-white shadow-sm">
               <tr>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Nhóm khuyến nghị</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Ngày KN</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Tên Cổ phiếu</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Giá KN</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Số phiên</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Giá hiện tại</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">% Thay đổi</th>
-                <th className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Lãi lỗ tạm tính</th>
+                <th className="px-6 py-4 text-[16px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Nhóm khuyến nghị</th>
+                <th className="px-6 py-4 text-[16px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Ngày KN</th>
+                <th className="px-6 py-4 text-[16px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Tên Cổ phiếu</th>
+                <th className="px-6 py-4 text-[16px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Giá KN</th>
+                <th className="px-6 py-4 text-[16px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Số phiên</th>
+                <th className="px-6 py-4 text-[16px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Giá hiện tại</th>
+                <th className="px-6 py-4 text-[16px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">% Thay đổi</th>
+                <th className="px-6 py-4 text-[16px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Lãi lỗ tạm tính</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -395,38 +395,38 @@ const RecommendationPortfolio: React.FC = () => {
                 return (
                   <tr key={`${item.symbol}-${index}`} className="hover:bg-slate-50/80 transition-colors duration-500 group">
                     <td className="px-6 py-4 transition-all duration-500">
-                      <span className="text-xs font-bold text-slate-600 transition-all duration-500">{item.group}</span>
+                      <span className="text-lg font-bold text-slate-600 transition-all duration-500">{item.group}</span>
                     </td>
                     <td className="px-6 py-4 transition-all duration-500">
-                      <span className="text-xs font-mono text-slate-500 transition-all duration-500">{item.date}</span>
+                      <span className="text-lg font-mono text-slate-500 transition-all duration-500">{item.date}</span>
                     </td>
                     <td className="px-6 py-4 transition-all duration-500">
-                      <span className={`text-sm font-black uppercase tracking-tight transition-all duration-500 ${profitLossColor}`}>
+                      <span className={`text-xl font-black uppercase tracking-tight transition-all duration-500 ${profitLossColor}`}>
                         {item.symbol}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right transition-all duration-500">
-                      <span className="text-sm font-mono font-medium text-slate-600 transition-all duration-500">
+                      <span className="text-lg font-mono font-medium text-slate-600 transition-all duration-500">
                         {(item.recommendedPrice * 1000).toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 3 })} VND
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center transition-all duration-500">
-                      <span className="px-2.5 py-1 bg-slate-100 rounded-lg text-[10px] font-black text-slate-600 uppercase transition-all duration-500">
+                      <span className="px-2.5 py-1 bg-slate-100 rounded-lg text-[15px] font-black text-slate-600 uppercase transition-all duration-500">
                         {calculateTPrefix(item.date)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right transition-all duration-500">
-                      <span className={`text-sm font-mono font-bold transition-all duration-500 ${changeColor}`}>
+                      <span className={`text-lg font-mono font-bold transition-all duration-500 ${changeColor}`}>
                         {(currentPrice * 1000).toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 3 })} VND
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right transition-all duration-500">
-                      <span className={`text-sm font-mono font-bold transition-all duration-500 ${changeColor}`}>
+                      <span className={`text-lg font-mono font-bold transition-all duration-500 ${changeColor}`}>
                         {changePercent > 0 ? '+' : ''}{changePercent.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right transition-all duration-500">
-                      <span className={`text-sm font-mono font-black transition-all duration-500 ${profitLossColor}`}>
+                      <span className={`text-lg font-mono font-black transition-all duration-500 ${profitLossColor}`}>
                         {profitLoss > 0 ? '+' : ''}{profitLoss.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
                       </span>
                     </td>

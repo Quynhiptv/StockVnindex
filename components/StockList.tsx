@@ -336,8 +336,8 @@ const StockList: React.FC = () => {
       <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">DANH SÁCH CỔ PHIẾU THEO DÕI</h2>
-            <div className="flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-widest">
+            <h2 className="text-4xl font-black text-slate-900 uppercase tracking-tight">DANH SÁCH CỔ PHIẾU THEO DÕI</h2>
+            <div className="flex flex-wrap gap-3 text-[15px] font-black uppercase tracking-widest">
               <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100">Phương pháp: ITC - SMC</span>
               <span className="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">Thực hiện: Team Đoàn Quỳnh</span>
               <span className="text-slate-400 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 italic">Cập nhật: {updateTime}</span>
@@ -358,7 +358,7 @@ const StockList: React.FC = () => {
         </div>
 
         <div className="overflow-x-auto rounded-3xl border border-slate-100">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-left text-lg">
             <thead>
               <tr className="bg-slate-50 text-slate-400 font-black uppercase tracking-wider">
                 {[
@@ -403,35 +403,35 @@ const StockList: React.FC = () => {
 
                 return (
                   <tr key={`${stock.symbol}-${index}`} className="hover:bg-slate-50 transition-colors group">
-                    <td className="px-6 py-5 font-black text-slate-900 transition-all duration-500">{stock.symbol}</td>
+                    <td className="px-6 py-5 font-black text-slate-900 transition-all duration-500 text-xl">{stock.symbol}</td>
                     
-                    <td className={`px-6 py-5 font-bold transition-all duration-500 ${isPriceInZone ? 'animate-blink-yellow text-amber-700' : 'text-slate-500'}`}>
+                    <td className={`px-6 py-5 font-bold transition-all duration-500 text-xl ${isPriceInZone ? 'animate-blink-yellow text-amber-700' : 'text-slate-500'}`}>
                       {formatPrice(stock.zone1)}
                     </td>
-                    <td className={`px-6 py-5 font-bold transition-all duration-500 ${isPriceInZone ? 'animate-blink-yellow text-amber-700' : 'text-slate-500'}`}>
+                    <td className={`px-6 py-5 font-bold transition-all duration-500 text-xl ${isPriceInZone ? 'animate-blink-yellow text-amber-700' : 'text-slate-500'}`}>
                       {formatPrice(stock.zone2)}
                     </td>
                     
-                    <td className={`px-6 py-5 font-bold transition-all duration-500 ${isAtExploratory ? 'animate-blink-green text-emerald-700' : 'text-slate-900'}`}>
+                    <td className={`px-6 py-5 font-bold transition-all duration-500 text-xl ${isAtExploratory ? 'animate-blink-green text-emerald-700' : 'text-slate-900'}`}>
                       {formatPrice(stock.exploratoryPrice)}
                     </td>
                     
-                    <td className={`px-6 py-5 font-bold transition-all duration-500 ${isAtTarget ? 'animate-blink-purple text-purple-700' : 'text-slate-900'}`}>
+                    <td className={`px-6 py-5 font-bold transition-all duration-500 text-xl ${isAtTarget ? 'animate-blink-purple text-purple-700' : 'text-slate-900'}`}>
                       {formatPrice(stock.targetPrice)}
                     </td>
                     
-                    <td className={`px-6 py-5 font-black transition-all duration-500 ${trendColor}`}>
+                    <td className={`px-6 py-5 font-black transition-all duration-500 text-xl ${trendColor}`}>
                       {formatPrice(stock.currentPrice)}
                     </td>
 
-                    <td className={`px-6 py-5 font-black transition-all duration-500 ${trendColor}`}>
+                    <td className={`px-6 py-5 font-black transition-all duration-500 text-xl ${trendColor}`}>
                       {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
                     </td>
 
                     <td className="px-6 py-5 transition-all duration-500">
                       {stock.exploratoryPrice > 0 ? (
                         <div className="flex items-center gap-2 transition-all duration-500">
-                          <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter transition-all duration-500 ${stock.requiredDropPercent === 0 ? 'bg-emerald-500 text-white animate-pulse' : 'bg-slate-100 text-slate-600'}`}>
+                          <div className={`px-3 py-1 rounded-full text-[15px] font-black uppercase tracking-tighter transition-all duration-500 ${stock.requiredDropPercent === 0 ? 'bg-emerald-500 text-white animate-pulse' : 'bg-slate-100 text-slate-600'}`}>
                             {stock.requiredDropPercent === 0 ? 'ĐIỂM MUA' : `-${stock.requiredDropPercent.toFixed(2)}%`}
                           </div>
                         </div>
