@@ -1,38 +1,19 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-const BULL_BEAR_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1233905660';
+const SUPABASE_URL = 'https://bwitfhihuqsjdpxrgxhb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_3mm3NKqJxoH-aOh79h4GWA_t7IbusZZ';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 interface BullBearStock {
   symbol: string;
   price: number;
   changePercent: number;
-  volVsAvg20: number;
   volume: number;
-  category: string;
+  high: number;
+  low: number;
+  trading_date?: string;
 }
-
-const cleanNumber = (val: string): number => {
-  if (!val || val === '-' || val === '' || val === '#N/A' || val === '#VALUE!') return 0;
-  let s = val.trim().replace('%', '');
-  const commaCount = (s.match(/,/g) || []).length;
-  const dotCount = (s.match(/\./g) || []).length;
-
-  if (commaCount > 0 && dotCount > 0) {
-    if (s.indexOf('.') < s.indexOf(',')) {
-      s = s.replace(/\./g, '').replace(',', '.');
-    } else {
-      s = s.replace(/,/g, '');
-    }
-  } else if (commaCount > 1) {
-    s = s.replace(/,/g, '');
-  } else if (dotCount > 1) {
-    s = s.replace(/\./g, '');
-  } else if (commaCount === 1) {
-    s = s.replace(',', '.');
-  }
-  const num = parseFloat(s);
-  return isNaN(num) ? 0 : num;
-};
 
 const getPriceColor = (change: number) => {
   if (change > 0) return 'text-emerald-600';
@@ -46,7 +27,6 @@ const TableHeader: React.FC = () => (
       <th className="px-5 py-4 text-left">Mã</th>
       <th className="px-5 py-4 text-right">Giá TT</th>
       <th className="px-5 py-4 text-right">% Đổi</th>
-      <th className="px-5 py-4 text-right">% KL/TB20</th>
       <th className="px-5 py-4 text-right">Khối lượng</th>
     </tr>
   </thead>
@@ -59,8 +39,7 @@ const StockRow: React.FC<{ stock: BullBearStock }> = ({ stock }) => (
     <td className={`px-5 py-4 text-right font-black text-xs transition-all duration-500 ${getPriceColor(stock.changePercent)}`}>
       {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
     </td>
-    <td className="px-5 py-4 text-right font-black text-xs text-slate-700 transition-all duration-500">{stock.volVsAvg20.toFixed(1)}%</td>
-    <td className="px-5 py-4 text-right font-bold text-xs text-slate-400 transition-all duration-500">{stock.volume.toLocaleString('vi-VN')}</td>
+    <td className="px-5 py-4 text-right font-bold text-xs text-slate-400 transition-all duration-500">{stock.volume.toLocaleString('vi-VN')} CP</td>
   </tr>
 );
 
@@ -69,50 +48,30 @@ const BullBearAction: React.FC = () => {
   const [updateDate, setUpdateDate] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  const parseCSV = (csv: string) => {
-    return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      for (let char of row) {
-        if (char === '"') inQuotes = !inQuotes;
-        else if (char === ',' && !inQuotes) {
-          result.push(current.trim());
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      result.push(current.trim());
-      return result;
-    });
-  };
-
   const fetchData = async () => {
     try {
-      const timestamp = new Date().getTime();
-      const response = await fetch(`${BULL_BEAR_URL}&t=${timestamp}`, { cache: 'no-store' });
-      if (!response.ok) throw new Error('Không thể tải dữ liệu');
-      const csv = await response.text();
-      const rows = parseCSV(csv);
-      
-      // Lấy dữ liệu ngày cập nhật từ ô B2 (rows[1][1])
-      if (rows[1] && rows[1][1]) {
-        setUpdateDate(rows[1][1]);
-      }
+      const { data: sbData, error: sbError } = await supabase
+        .from('ohcl_dnse')
+        .select('symbol, close_price, phan_tram_thay_doi, gia_cao_nhat, gia_thap_nhat, tong_klgd_x10, trading_date');
 
-      const parsedData: BullBearStock[] = rows
-        .slice(1)
-        .filter(row => row[0] && row[0] !== 'Mã CP' && row[0] !== '')
-        .map(row => ({
-          symbol: row[0],
-          price: cleanNumber(row[2]),
-          changePercent: cleanNumber(row[3]),
-          volVsAvg20: cleanNumber(row[4]),
-          volume: cleanNumber(row[5]),
-          category: row[6]?.trim() || ''
+      if (sbError) throw sbError;
+
+      if (sbData && sbData.length > 0) {
+        if (sbData[0].trading_date) {
+          const date = new Date(sbData[0].trading_date);
+          setUpdateDate(date.toLocaleDateString('vi-VN'));
+        }
+
+        const parsedData: BullBearStock[] = sbData.map(item => ({
+          symbol: item.symbol,
+          price: item.close_price || 0,
+          changePercent: item.phan_tram_thay_doi || 0,
+          volume: item.tong_klgd_x10 || 0,
+          high: item.gia_cao_nhat || 0,
+          low: item.gia_thap_nhat || 0
         }));
-      setData(parsedData);
+        setData(parsedData);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -122,16 +81,16 @@ const BullBearAction: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 5000);
+    const interval = setInterval(fetchData, 30000); // Refresh every 30s
     return () => clearInterval(interval);
   }, []);
 
   const highestClosing = useMemo(() => 
-    data.filter(s => s.category.toLowerCase().includes('cao nhất')).sort((a, b) => b.changePercent - a.changePercent), 
+    data.filter(s => s.price > 0 && s.price >= s.high * 0.99995).sort((a, b) => b.changePercent - a.changePercent), 
   [data]);
   
   const lowestClosing = useMemo(() => 
-    data.filter(s => s.category.toLowerCase().includes('thấp nhất')).sort((a, b) => a.changePercent - b.changePercent), 
+    data.filter(s => s.price > 0 && s.price <= s.low * 1.00005).sort((a, b) => a.changePercent - b.changePercent), 
   [data]);
 
   if (loading && data.length === 0) {

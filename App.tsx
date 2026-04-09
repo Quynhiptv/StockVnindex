@@ -14,6 +14,7 @@ import ActiveBuySell from './components/ActiveBuySell';
 import BigOrderFilter from './components/BigOrderFilter';
 import RecommendationPortfolio from './components/RecommendationPortfolio';
 import SectorAnalysis from './components/SectorAnalysis';
+import TopVolatility from './components/TopVolatility';
 import SystemSettings from './components/SystemSettings';
 
 const App: React.FC = () => {
@@ -60,6 +61,8 @@ const App: React.FC = () => {
         return <ForeignFlow />;
       case MarketTab.VOLUME_SURGE:
         return <VolumeSurge />;
+      case MarketTab.TOP_VOLATILITY:
+        return <TopVolatility />;
       case MarketTab.BULL_BEAR:
         return <BullBearAction />;
       case MarketTab.BIG_ORDER:

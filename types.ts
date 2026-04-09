@@ -3,6 +3,7 @@ export enum MarketTab {
   OVERVIEW = 'Tổng Quan',
   FOREIGN_FLOW = 'Khối Ngoại',
   VOLUME_SURGE = 'Đột biến KL',
+  TOP_VOLATILITY = 'TOP biến động',
   BULL_BEAR = 'Bullish/Bearish',
   BIG_ORDER = 'Lọc Lệnh BIG',
   ACTIVE_BUY_SELL = 'M/B Chủ động',
