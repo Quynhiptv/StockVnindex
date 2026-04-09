@@ -210,6 +210,7 @@ async function startServer() {
   });
 
   app.get('/api/stock-data', async (req, res) => {
+    console.log('API Request received: /api/stock-data');
     try {
       const timestamp = new Date().getTime();
       const response = await fetch(`${STOCK_DATA_SHEET_URL}&t=${timestamp}`, { cache: 'no-store' });
