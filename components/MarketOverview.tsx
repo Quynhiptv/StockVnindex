@@ -5,17 +5,24 @@ import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChar
 import VN30F1MChart from './VN30F1MChart';
 
 const INDEX_SHEET_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=0';
+const NEW_INDEX_SHEET_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1477300983';
 const MOMENTUM_SHEET_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1280701284';
 
 interface MarketIndexData {
   name: string;
   price: string;
+  changePoints: string;
   changePercent: string;
   value: string;
   rsi: string;
   ma20: string;
   volYesterday: string;
   volAvg20: string;
+  ceiling: string;
+  up: string;
+  unchanged: string;
+  down: string;
+  floor: string;
 }
 
 interface MomentumPoint {
@@ -48,37 +55,66 @@ const IndexCard: React.FC<{ data: MarketIndexData }> = ({ data }) => {
   let priceColor = 'text-slate-900';
 
   if (changeVal > 0) {
-    bgColor = 'bg-emerald-50/20'; 
-    borderColor = 'border-emerald-100';
-    badgeColor = 'bg-emerald-500 text-white';
-    priceColor = 'text-emerald-700';
+    bgColor = 'bg-emerald-500'; 
+    borderColor = 'border-emerald-600';
+    badgeColor = 'bg-white/20 text-white';
+    priceColor = 'text-white';
   } else if (changeVal < 0) {
-    bgColor = 'bg-rose-50/20';
-    borderColor = 'border-rose-100';
-    badgeColor = 'bg-rose-500 text-white';
-    priceColor = 'text-rose-700';
+    bgColor = 'bg-rose-500';
+    borderColor = 'border-rose-600';
+    badgeColor = 'bg-white/20 text-white';
+    priceColor = 'text-white';
+  } else if (changeVal === 0) {
+    bgColor = 'bg-amber-400';
+    borderColor = 'border-amber-500';
+    badgeColor = 'bg-white/20 text-white';
+    priceColor = 'text-white';
   }
 
   const rawValue = cleanNumeric(data.value);
-  const formattedValue = Math.round(rawValue / 1000).toLocaleString('vi-VN') + ' TỶ';
+  const formattedValue = Math.round(rawValue).toLocaleString('vi-VN') + ' TỶ';
 
   return (
     <div className={`${bgColor} border-2 ${borderColor} rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden`}>
-      <div className="flex justify-between items-start mb-6">
-        <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter">{data.name}</h3>
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="text-xl font-black text-white uppercase tracking-tighter">{data.name}</h3>
         <div className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase shadow-sm ${badgeColor}`}>
-          {ensurePercent(data.changePercent)}
+          {data.changePoints} ({ensurePercent(data.changePercent)})
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <div className={`text-4xl sm:text-5xl font-black ${priceColor} tracking-tighter leading-none tabular-nums transition-all duration-500`}>{data.price}</div>
-        <div className="text-slate-500 text-[10px] font-black mt-4 bg-slate-100/80 inline-block px-4 py-1.5 rounded-full uppercase border border-slate-200 shadow-sm transition-all duration-500">
+        <div className="text-white/90 text-[10px] font-black mt-3 bg-white/10 inline-block px-4 py-1.5 rounded-full uppercase border border-white/20 shadow-sm transition-all duration-500">
           GTGD: {formattedValue}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-6 pt-6 border-t border-slate-200/50">
+      {/* Stock Counts Section */}
+      <div className="grid grid-cols-5 gap-1 mb-6 bg-black/5 rounded-2xl p-3 border border-white/10">
+        <div className="text-center">
+          <p className="text-[9px] text-purple-200 font-black uppercase mb-1">Trần</p>
+          <p className="text-sm font-black text-purple-300">{data.ceiling}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[9px] text-emerald-200 font-black uppercase mb-1">Tăng</p>
+          <p className="text-sm font-black text-emerald-300">{data.up}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[9px] text-amber-100 font-black uppercase mb-1">Tham chiếu</p>
+          <p className="text-sm font-black text-amber-200">{data.unchanged}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[9px] text-rose-200 font-black uppercase mb-1">Giảm</p>
+          <p className="text-sm font-black text-rose-300">{data.down}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[9px] text-cyan-200 font-black uppercase mb-1">Sàn</p>
+          <p className="text-sm font-black text-cyan-300">{data.floor}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-x-4 gap-y-4 pt-4 border-t border-white/20 bg-white/90 rounded-b-[1.5rem] -mx-6 -mb-6 p-6">
         <div>
           <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">RSI (14)</p>
           <p className="text-lg font-black text-slate-800 tabular-nums transition-all duration-500">{data.rsi}</p>
@@ -213,14 +249,16 @@ const MarketOverview: React.FC = () => {
   const fetchData = async () => {
     try {
       const timestamp = new Date().getTime();
-      const [indexRes, momentumRes] = await Promise.all([
+      const [indexRes, newIndexRes, momentumRes] = await Promise.all([
         fetch(`${INDEX_SHEET_URL}&t=${timestamp}`, { cache: 'no-store' }),
+        fetch(`${NEW_INDEX_SHEET_URL}&t=${timestamp}`, { cache: 'no-store' }),
         fetch(`${MOMENTUM_SHEET_URL}&t=${timestamp}`, { cache: 'no-store' })
       ]);
 
-      if (!indexRes.ok || !momentumRes.ok) throw new Error('Dữ liệu chưa sẵn sàng');
+      if (!indexRes.ok || !newIndexRes.ok || !momentumRes.ok) throw new Error('Dữ liệu chưa sẵn sàng');
       
       const indexCSV = await indexRes.text();
+      const newIndexCSV = await newIndexRes.text();
       const momentumCSV = await momentumRes.text();
       setLastUpdated(new Date().toLocaleTimeString('vi-VN'));
 
@@ -244,20 +282,54 @@ const MarketOverview: React.FC = () => {
       };
 
       const indexRows = parseRows(indexCSV);
+      const newIndexRows = parseRows(newIndexCSV);
       const targetNames = ['VNINDEX', 'VN30', 'UPINDEX', 'HNX30', 'HNXINDEX', 'VNXALL'];
+
+      // Create a map for the new data
+      const newDataMap = new Map();
+      newIndexRows.slice(1).forEach(row => {
+        if (row[0]) {
+          let name = row[0].trim();
+          if (name.includes('-')) {
+            name = name.split('-').pop()?.trim() || name;
+          }
+          newDataMap.set(name, {
+            price: row[1]?.trim() || '0',
+            changePoints: row[2]?.trim() || '0',
+            changePercent: row[3]?.trim() || '0',
+            value: row[4]?.trim() || '0',
+            ceiling: row[5]?.trim() || '0',
+            up: row[6]?.trim() || '0',
+            unchanged: row[7]?.trim() || '0',
+            down: row[8]?.trim() || '0',
+            floor: row[9]?.trim() || '0'
+          });
+        }
+      });
+
       const mappedIndices: MarketIndexData[] = indexRows
         .slice(1)
         .filter(row => row[0] && targetNames.includes(row[0].trim()))
-        .map(row => ({
-          name: row[0].trim(),
-          price: row[9]?.trim() || '0',
-          changePercent: row[7]?.trim() || '0',
-          value: row[3]?.trim() || '0',
-          rsi: row[18]?.trim() || '0',
-          ma20: row[16]?.trim() || '0',
-          volYesterday: row[4]?.trim() || '0',
-          volAvg20: row[6]?.trim() || '0'
-        }));
+        .map(row => {
+          const name = row[0].trim();
+          const newData = newDataMap.get(name) || {};
+          return {
+            name: name,
+            price: newData.price || row[9]?.trim() || '0',
+            changePoints: newData.changePoints || '0',
+            changePercent: newData.changePercent || row[7]?.trim() || '0',
+            value: newData.value || row[3]?.trim() || '0',
+            rsi: row[18]?.trim() || '0',
+            ma20: row[16]?.trim() || '0',
+            volYesterday: row[4]?.trim() || '0',
+            volAvg20: row[6]?.trim() || '0',
+            ceiling: newData.ceiling || '0',
+            up: newData.up || '0',
+            unchanged: newData.unchanged || '0',
+            down: newData.down || '0',
+            floor: newData.floor || '0'
+          };
+        });
       mappedIndices.sort((a, b) => targetNames.indexOf(a.name) - targetNames.indexOf(b.name));
       setIndices(mappedIndices);
 
