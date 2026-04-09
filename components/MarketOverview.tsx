@@ -55,20 +55,20 @@ const IndexCard: React.FC<{ data: MarketIndexData }> = ({ data }) => {
   let priceColor = 'text-slate-900';
 
   if (changeVal > 0) {
-    bgColor = 'bg-emerald-500'; 
-    borderColor = 'border-emerald-600';
-    badgeColor = 'bg-white/20 text-white';
-    priceColor = 'text-white';
+    bgColor = 'bg-emerald-50'; 
+    borderColor = 'border-emerald-200';
+    badgeColor = 'bg-emerald-100 text-emerald-700';
+    priceColor = 'text-emerald-600';
   } else if (changeVal < 0) {
-    bgColor = 'bg-rose-500';
-    borderColor = 'border-rose-600';
-    badgeColor = 'bg-white/20 text-white';
-    priceColor = 'text-white';
+    bgColor = 'bg-rose-50';
+    borderColor = 'border-rose-200';
+    badgeColor = 'bg-rose-100 text-rose-700';
+    priceColor = 'text-rose-600';
   } else if (changeVal === 0) {
-    bgColor = 'bg-amber-400';
-    borderColor = 'border-amber-500';
-    badgeColor = 'bg-white/20 text-white';
-    priceColor = 'text-white';
+    bgColor = 'bg-amber-50';
+    borderColor = 'border-amber-200';
+    badgeColor = 'bg-amber-100 text-amber-700';
+    priceColor = 'text-amber-600';
   }
 
   const rawValue = cleanNumeric(data.value);
@@ -77,7 +77,7 @@ const IndexCard: React.FC<{ data: MarketIndexData }> = ({ data }) => {
   return (
     <div className={`${bgColor} border-2 ${borderColor} rounded-[2.5rem] p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden`}>
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-3xl font-black text-white uppercase tracking-tighter">{data.name}</h3>
+        <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">{data.name}</h3>
         <div className={`px-3 py-1.5 rounded-xl text-[16px] font-black uppercase shadow-sm ${badgeColor}`}>
           {data.changePoints} ({ensurePercent(data.changePercent)})
         </div>
@@ -85,36 +85,36 @@ const IndexCard: React.FC<{ data: MarketIndexData }> = ({ data }) => {
 
       <div className="mb-4">
         <div className={`text-6xl sm:text-7xl font-black ${priceColor} tracking-tighter leading-none tabular-nums transition-all duration-500`}>{data.price}</div>
-        <div className="text-white/90 text-[15px] font-black mt-3 bg-white/10 inline-block px-4 py-1.5 rounded-full uppercase border border-white/20 shadow-sm transition-all duration-500">
+        <div className="text-slate-500 text-[15px] font-black mt-3 bg-black/5 inline-block px-4 py-1.5 rounded-full uppercase border border-black/5 shadow-sm transition-all duration-500">
           GTGD: {formattedValue}
         </div>
       </div>
 
       {/* Stock Counts Section */}
-      <div className="grid grid-cols-5 gap-1 mb-6 bg-black/5 rounded-2xl p-3 border border-white/10">
+      <div className="grid grid-cols-5 gap-1 mb-6 bg-white/50 rounded-2xl p-3 border border-black/5">
         <div className="text-center">
-          <p className="text-[14px] text-purple-200 font-black uppercase mb-1">Trần</p>
-          <p className="text-xl font-black text-purple-300">{data.ceiling}</p>
+          <p className="text-[14px] text-purple-400 font-black uppercase mb-1">Trần</p>
+          <p className="text-xl font-black text-purple-600">{data.ceiling}</p>
         </div>
         <div className="text-center">
-          <p className="text-[14px] text-emerald-200 font-black uppercase mb-1">Tăng</p>
-          <p className="text-xl font-black text-emerald-300">{data.up}</p>
+          <p className="text-[14px] text-emerald-500 font-black uppercase mb-1">Tăng</p>
+          <p className="text-xl font-black text-emerald-600">{data.up}</p>
         </div>
         <div className="text-center">
-          <p className="text-[14px] text-amber-100 font-black uppercase mb-1">Tham chiếu</p>
-          <p className="text-xl font-black text-amber-200">{data.unchanged}</p>
+          <p className="text-[14px] text-amber-500 font-black uppercase mb-1">Tham chiếu</p>
+          <p className="text-xl font-black text-amber-600">{data.unchanged}</p>
         </div>
         <div className="text-center">
-          <p className="text-[14px] text-rose-200 font-black uppercase mb-1">Giảm</p>
-          <p className="text-xl font-black text-rose-300">{data.down}</p>
+          <p className="text-[14px] text-rose-500 font-black uppercase mb-1">Giảm</p>
+          <p className="text-xl font-black text-rose-600">{data.down}</p>
         </div>
         <div className="text-center">
-          <p className="text-[14px] text-cyan-200 font-black uppercase mb-1">Sàn</p>
-          <p className="text-xl font-black text-cyan-300">{data.floor}</p>
+          <p className="text-[14px] text-cyan-500 font-black uppercase mb-1">Sàn</p>
+          <p className="text-xl font-black text-cyan-600">{data.floor}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-4 pt-4 border-t border-white/20 bg-white/90 rounded-b-[1.5rem] -mx-6 -mb-6 p-6">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-4 pt-4 border-t border-black/5 bg-white/40 rounded-b-[1.5rem] -mx-6 -mb-6 p-6">
         <div>
           <p className="text-[15px] text-slate-400 font-black uppercase tracking-widest mb-1 transition-all duration-500">RSI (14)</p>
           <p className="text-2xl font-black text-slate-800 tabular-nums transition-all duration-500">{data.rsi}</p>
