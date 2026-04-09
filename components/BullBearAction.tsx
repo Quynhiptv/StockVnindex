@@ -1,9 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL = 'https://bwitfhihuqsjdpxrgxhb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_3mm3NKqJxoH-aOh79h4GWA_t7IbusZZ';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 interface BullBearStock {
   symbol: string;
@@ -50,11 +45,9 @@ const BullBearAction: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const { data: sbData, error: sbError } = await supabase
-        .from('ohcl_dnse')
-        .select('symbol, close_price, phan_tram_thay_doi, gia_cao_nhat, gia_thap_nhat, tong_klgd_x10, trading_date');
-
-      if (sbError) throw sbError;
+      const response = await fetch('/api/stock-data');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const sbData = await response.json();
 
       if (sbData && sbData.length > 0) {
         if (sbData[0].trading_date) {
@@ -62,7 +55,7 @@ const BullBearAction: React.FC = () => {
           setUpdateDate(date.toLocaleDateString('vi-VN'));
         }
 
-        const parsedData: BullBearStock[] = sbData.map(item => ({
+        const parsedData: BullBearStock[] = sbData.map((item: any) => ({
           symbol: item.symbol,
           price: item.close_price || 0,
           changePercent: item.phan_tram_thay_doi || 0,

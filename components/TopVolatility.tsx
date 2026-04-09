@@ -1,10 +1,5 @@
 
 import React, { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const SUPABASE_URL = 'https://bwitfhihuqsjdpxrgxhb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_3mm3NKqJxoH-aOh79h4GWA_t7IbusZZ';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 interface StockVolatility {
   symbol: string;
@@ -24,11 +19,9 @@ const TopVolatility: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const { data, error: sbError } = await supabase
-        .from('ohcl_dnse')
-        .select('symbol, close_price, phan_tram_thay_doi, tong_klgd_x10, trading_date');
-
-      if (sbError) throw sbError;
+      const response = await fetch('/api/stock-data');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
 
       if (data && data.length > 0) {
         // Set trading date from the first record
@@ -40,7 +33,7 @@ const TopVolatility: React.FC = () => {
         const sorted = [...data].sort((a, b) => b.phan_tram_thay_doi - a.phan_tram_thay_doi);
         
         // Filter out items with null or invalid data if necessary
-        const validData = sorted.filter(item => item.symbol && item.phan_tram_thay_doi !== null);
+        const validData = sorted.filter((item: any) => item.symbol && item.phan_tram_thay_doi !== null);
 
         setTopGainers(validData.slice(0, 30));
         setTopLosers([...validData].reverse().slice(0, 30));

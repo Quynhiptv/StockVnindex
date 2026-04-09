@@ -3,9 +3,14 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const SUPABASE_URL = 'https://bwitfhihuqsjdpxrgxhb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_3mm3NKqJxoH-aOh79h4GWA_t7IbusZZ';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const STOCK_LIST_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1358455783';
 const PRICE_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
@@ -205,6 +210,20 @@ async function startServer() {
   // API routes
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
+  });
+
+  app.get('/api/stock-data', async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from('ohcl_dnse')
+        .select('symbol, close_price, phan_tram_thay_doi, gia_cao_nhat, gia_thap_nhat, tong_klgd_x10, trading_date');
+
+      if (error) throw error;
+      res.json(data);
+    } catch (error: any) {
+      console.error('Supabase Proxy Error:', error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   if (process.env.NODE_ENV !== 'production') {
