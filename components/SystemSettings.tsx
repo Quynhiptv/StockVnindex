@@ -1,11 +1,14 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 const PORTFOLIO_URL = 'https://docs.google.com/spreadsheets/d/1ahPELoUrj-w4MtwUY3tK9tL3FkpJBOSt2aIWa8dqQ9A/export?format=csv&gid=0';
 const WATCHLIST_URL = 'https://docs.google.com/spreadsheets/d/1ahPELoUrj-w4MtwUY3tK9tL3FkpJBOSt2aIWa8dqQ9A/export?format=csv&gid=478926059';
 const SIMULATED_PORTFOLIO_URL = 'https://docs.google.com/spreadsheets/d/1ahPELoUrj-w4MtwUY3tK9tL3FkpJBOSt2aIWa8dqQ9A/export?format=csv&gid=1160230931';
 const PRICE_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
 const PASSWORD = '1234566';
+
+const TELEGRAM_BOT_TOKEN = '8213831667:AAGsz3XcF-18Iv5hFWSbHwWsdN80860dC6w';
+const TELEGRAM_CHAT_ID = '-1003876897678';
 
 interface PortfolioItem {
   symbol: string;
@@ -46,6 +49,101 @@ const SystemSettings: React.FC = () => {
     avgProfit: number;
     trades: PortfolioItem[];
   } | null>(null);
+
+  const alertHistory = useRef<Record<string, { lastSent: number, count: number, date: string }>>(
+    JSON.parse(localStorage.getItem('system_watchlist_alerts_history') || '{}')
+  );
+
+  const sendTelegramMessage = async (message: string) => {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    try {
+      await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: 'Markdown',
+        }),
+      });
+    } catch (error) {
+      console.error('Lỗi gửi Telegram:', error);
+    }
+  };
+
+  const checkWatchlistAlerts = () => {
+    const now = new Date();
+    const vnTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+    const hour = vnTime.getHours();
+    const today = vnTime.toLocaleDateString('vi-VN');
+    
+    if (hour < 9 || hour >= 15) return;
+
+    watchlistData.forEach(item => {
+      const minZone = Math.min(item.zone1, item.zone2);
+      const maxZone = Math.max(item.zone1, item.zone2);
+      
+      const isInZone = item.marketPrice > 0 && 
+                       item.marketPrice >= minZone && 
+                       item.marketPrice <= maxZone;
+
+      if (isInZone) {
+        handleAlert(item, today);
+      }
+    });
+  };
+
+  const handleAlert = (item: WatchlistItem, today: string) => {
+    const key = `${item.symbol}_watchlist`;
+    const history = alertHistory.current[key];
+    const now = Date.now();
+
+    if (!history || history.date !== today) {
+      sendAlert(item);
+      updateHistory(key, { lastSent: now, count: 1, date: today });
+      return;
+    }
+
+    if (history.count >= 4) return;
+
+    const diffMinutes = (now - history.lastSent) / (1000 * 60);
+    let shouldSend = false;
+    
+    if (history.count === 1 && diffMinutes >= 10) shouldSend = true;
+    else if (history.count === 2 && diffMinutes >= 20) shouldSend = true;
+    else if (history.count === 3 && diffMinutes >= 20) shouldSend = true;
+
+    if (shouldSend) {
+      sendAlert(item);
+      updateHistory(key, { ...history, lastSent: now, count: history.count + 1 });
+    }
+  };
+
+  const updateHistory = (key: string, state: { lastSent: number, count: number, date: string }) => {
+    alertHistory.current[key] = state;
+    localStorage.setItem('system_watchlist_alerts_history', JSON.stringify(alertHistory.current));
+  };
+
+  const sendAlert = (item: WatchlistItem) => {
+    const trendIcon = item.changePercent > 0 ? '📈' : item.changePercent < 0 ? '📉' : '➖';
+    
+    const message = `🔔 *CẢNH BÁO THEO DÕI (HỆ THỐNG)* 📊\n` +
+              `━━━━━━━━━━━━━━━━━━\n` +
+              `💎 Mã cổ phiếu: *${item.symbol}*\n` +
+              `💵 Giá hiện tại: *${item.marketPrice.toFixed(2)}*\n` +
+              `${trendIcon} Biến động: *${item.changePercent > 0 ? '+' : ''}${item.changePercent.toFixed(2)}%*\n` +
+              `📝 Trạng thái: _Cổ phiếu trong tầm ngắm phiên tới_\n` +
+              `━━━━━━━━━━━━━━━━━━\n` +
+              `🚀 *Team Đoàn Quỳnh - ITC & SMC Strategy* CVG`;
+    
+    sendTelegramMessage(message);
+  };
+
+  useEffect(() => {
+    if (watchlistData.length > 0) {
+      checkWatchlistAlerts();
+    }
+  }, [watchlistData]);
 
   const parseCSV = (csv: string) => {
     return csv.split(/\r?\n/).filter(line => line.trim() !== '').map(row => {
