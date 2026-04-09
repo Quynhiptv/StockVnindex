@@ -26,8 +26,7 @@ const TopVolatility: React.FC = () => {
       if (data && data.length > 0) {
         // Set trading date from the first record
         if (data[0].trading_date) {
-          const date = new Date(data[0].trading_date);
-          setTradingDate(date.toLocaleDateString('vi-VN'));
+          setTradingDate(data[0].trading_date);
         }
 
         const sorted = [...data].sort((a, b) => b.phan_tram_thay_doi - a.phan_tram_thay_doi);

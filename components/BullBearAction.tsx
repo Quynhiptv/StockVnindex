@@ -51,8 +51,7 @@ const BullBearAction: React.FC = () => {
 
       if (sbData && sbData.length > 0) {
         if (sbData[0].trading_date) {
-          const date = new Date(sbData[0].trading_date);
-          setUpdateDate(date.toLocaleDateString('vi-VN'));
+          setUpdateDate(sbData[0].trading_date);
         }
 
         const parsedData: BullBearStock[] = sbData.map((item: any) => ({

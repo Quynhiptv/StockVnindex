@@ -14,6 +14,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const STOCK_LIST_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1358455783';
 const PRICE_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
+const STOCK_DATA_SHEET_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=838120477';
 const TELEGRAM_BOT_TOKEN = '8213831667:AAGsz3XcF-18Iv5hFWSbHwWsdN80860dC6w';
 const TELEGRAM_CHAT_ID = '-1003876897678';
 
@@ -59,7 +60,8 @@ const parseCSV = (csv: string) => {
 
 const cleanNumber = (val: string) => {
   if (!val) return 0;
-  const cleaned = val.replace(/[^\d.-]/g, '');
+  // Thay thế dấu phẩy bằng dấu chấm để xử lý số thập phân, sau đó loại bỏ các ký tự không phải số/chấm/dấu trừ
+  const cleaned = val.replace(/,/g, '.').replace(/[^\d.-]/g, '');
   return parseFloat(cleaned) || 0;
 };
 
@@ -214,14 +216,45 @@ async function startServer() {
 
   app.get('/api/stock-data', async (req, res) => {
     try {
-      const { data, error } = await supabase
-        .from('ohcl_dnse')
-        .select('symbol, close_price, phan_tram_thay_doi, gia_cao_nhat, gia_thap_nhat, tong_klgd_x10, trading_date');
+      const timestamp = new Date().getTime();
+      const response = await fetch(`${STOCK_DATA_SHEET_URL}&t=${timestamp}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error('Không thể tải dữ liệu từ Google Sheets');
+      const csvText = await response.text();
+      const rows = parseCSV(csvText);
 
-      if (error) throw error;
+      // Dữ liệu từ hàng 2 (index 1), hàng 1 là tiêu đề
+      const data = rows.slice(1).map(row => {
+        if (row.length < 9) return null;
+
+        // Cột A(0)=Symbol, C(2)=Trading Date, E(4)=Close Price, F(5)=% Change, G(6)=High, H(7)=Low, I(8)=Total Vol
+        const volRaw = row[8] || '0';
+        const commaCount = (volRaw.match(/,/g) || []).length;
+        let volume = 0;
+        
+        if (commaCount === 1) {
+          // Nếu có 1 dấu phẩy, thay bằng chấm và nhân 1000 (ví dụ 313,4 -> 313.4 * 1000 = 313400)
+          const volCleaned = volRaw.replace(/,/g, '.');
+          volume = (parseFloat(volCleaned) || 0) * 1000;
+        } else {
+          // Nếu có 2 dấu phẩy hoặc khác, giữ nguyên (loại bỏ dấu phẩy để parse số)
+          const volCleaned = volRaw.replace(/,/g, '');
+          volume = parseFloat(volCleaned) || 0;
+        }
+
+        return {
+          symbol: row[0],
+          trading_date: row[2],
+          close_price: cleanNumber(row[4]) * 1000,
+          phan_tram_thay_doi: cleanNumber(row[5]),
+          gia_cao_nhat: cleanNumber(row[6]) * 1000,
+          gia_thap_nhat: cleanNumber(row[7]) * 1000,
+          tong_klgd_x10: volume
+        };
+      }).filter(item => item !== null && item.symbol);
+
       res.json(data);
     } catch (error: any) {
-      console.error('Supabase Proxy Error:', error);
+      console.error('Google Sheets Proxy Error:', error);
       res.status(500).json({ error: error.message });
     }
   });
