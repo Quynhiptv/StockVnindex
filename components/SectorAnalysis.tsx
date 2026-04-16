@@ -316,7 +316,7 @@ const SectorAnalysis: React.FC = () => {
           <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Biểu đồ biến động nhóm ngành (%)</h3>
         </div>
         
-        <div className="h-[400px] w-full">
+        <div className="h-[500px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={sortedData}
@@ -328,8 +328,8 @@ const SectorAnalysis: React.FC = () => {
               <YAxis 
                 dataKey="name" 
                 type="category" 
-                width={120} 
-                tick={{ fontSize: 10, fontWeight: 900, fill: '#475569' }}
+                width={150} 
+                tick={{ fontSize: 12, fontWeight: 900, fill: '#475569' }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -375,25 +375,25 @@ const SectorAnalysis: React.FC = () => {
           <table className="w-full text-left border-separate border-spacing-0">
             <thead>
               <tr className="bg-slate-50/50">
-                <th className="px-6 py-4 sticky left-0 bg-slate-50/90 backdrop-blur-sm z-20 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="px-6 py-4 sticky left-0 bg-slate-50/90 backdrop-blur-sm z-20 text-[15px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                   Nhóm ngành
                 </th>
-                <th className="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="px-6 py-4 text-right text-[15px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                   % KL / Phiên trước
                 </th>
-                <th className="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="px-6 py-4 text-right text-[15px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                   % KL / TB 20P
                 </th>
-                <th className="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="px-6 py-4 text-right text-[15px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                   % Tăng giảm
                 </th>
-                <th className="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="px-6 py-4 text-right text-[15px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                   % Trước đó
                 </th>
-                <th className="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="px-6 py-4 text-right text-[15px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                   Sức mạnh
                 </th>
-                <th className="px-6 py-4 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="px-6 py-4 text-right text-[15px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                   Biến động bậc
                 </th>
               </tr>
@@ -401,31 +401,31 @@ const SectorAnalysis: React.FC = () => {
             <tbody className="divide-y divide-slate-50">
               {sortedData.map((item, index) => (
                 <tr key={`${item.name}-${index}`} className="hover:bg-blue-50/30 transition-all duration-500 group">
-                  <td className="px-6 py-5 font-black text-sm text-slate-900 sticky left-0 bg-white group-hover:bg-blue-50/30 z-10 border-b border-slate-50 transition-all duration-500">
+                  <td className="px-6 py-2 font-black text-lg text-slate-900 sticky left-0 bg-white group-hover:bg-blue-50/30 z-10 border-b border-slate-50 transition-all duration-500">
                     {item.name}
                   </td>
-                  <td className="px-6 py-5 text-right font-mono font-bold text-sm text-slate-600 tabular-nums border-b border-slate-50 transition-all duration-500">
+                  <td className="px-6 py-2 text-right font-mono font-bold text-lg text-slate-600 tabular-nums border-b border-slate-50 transition-all duration-500">
                     {Math.round(item.volVsPrev)}%
                   </td>
-                  <td className="px-6 py-5 text-right font-mono font-bold text-sm text-slate-600 tabular-nums border-b border-slate-50 transition-all duration-500">
+                  <td className="px-6 py-2 text-right font-mono font-bold text-lg text-slate-600 tabular-nums border-b border-slate-50 transition-all duration-500">
                     {Math.round(item.volVsAvg20)}%
                   </td>
-                  <td className={`px-6 py-5 text-right font-mono font-black text-sm tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.changeToday)}`}>
+                  <td className={`px-6 py-2 text-right font-mono font-black text-lg tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.changeToday)}`}>
                     <div className="flex items-center justify-end gap-1 transition-all duration-500">
                       {item.changeToday > 0 ? '▲' : item.changeToday < 0 ? '▼' : '•'}
                       {Math.abs(item.changeToday).toFixed(2)}%
                     </div>
                   </td>
-                  <td className={`px-6 py-5 text-right font-mono font-bold text-sm tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.changePrev)}`}>
+                  <td className={`px-6 py-2 text-right font-mono font-bold text-lg tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.changePrev)}`}>
                     {item.changePrev > 0 ? '+' : ''}{item.changePrev.toFixed(2)}%
                   </td>
-                  <td className="px-6 py-5 text-right font-mono font-black text-sm text-slate-900 tabular-nums border-b border-slate-50 transition-all duration-500">
+                  <td className="px-6 py-2 text-right font-mono font-black text-lg text-slate-900 tabular-nums border-b border-slate-50 transition-all duration-500">
                     <span className="px-2 py-1 bg-slate-100 rounded-md transition-all duration-500">
                       {item.strengthIndex.toFixed(1)}
                     </span>
                   </td>
-                  <td className={`px-6 py-5 text-right font-mono font-black text-sm tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.strengthChange)}`}>
-                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase transition-all duration-500 ${item.strengthChange > 0 ? 'bg-emerald-50' : item.strengthChange < 0 ? 'bg-rose-50' : 'bg-amber-50'}`}>
+                  <td className={`px-6 py-2 text-right font-mono font-black text-lg tabular-nums border-b border-slate-50 transition-all duration-500 ${getTrendColor(item.strengthChange)}`}>
+                    <span className={`inline-block px-3 py-1 rounded-full text-[14px] font-black uppercase transition-all duration-500 ${item.strengthChange > 0 ? 'bg-emerald-50' : item.strengthChange < 0 ? 'bg-rose-50' : 'bg-amber-50'}`}>
                       {item.strengthChange > 0 ? '+' : ''}{Math.round(item.strengthChange)} Bậc
                     </span>
                   </td>
