@@ -10,6 +10,7 @@ export enum MarketTab {
   SECTORS = 'Nhóm Ngành',
   ATC_PRICE_ACTION = 'ATC Kéo/Đạp',
   ATC_FOREIGN = 'ATC Khối Ngoại',
+  BOT_SIGNALS = 'Tín hiệu BOT',
   STOCK_LIST = 'Danh Sách CP',
   RECOMMENDATIONS = 'Danh Mục Khuyến Nghị',
   SYSTEM_SETTINGS = 'Cài đặt Hệ thống'

@@ -7,6 +7,7 @@ import MarketOverview from './components/MarketOverview';
 import ForeignFlow from './components/ForeignFlow';
 import ATCForeign from './components/ATCForeign';
 import ATCPriceAction from './components/ATCPriceAction';
+import BotSignals from './components/BotSignals';
 import StockList from './components/StockList';
 import VolumeSurge from './components/VolumeSurge';
 import BullBearAction from './components/BullBearAction';
@@ -69,6 +70,8 @@ const App: React.FC = () => {
         return <BigOrderFilter />;
       case MarketTab.ATC_FOREIGN:
         return <ATCForeign />;
+      case MarketTab.BOT_SIGNALS:
+        return <BotSignals />;
       case MarketTab.ATC_PRICE_ACTION:
         return <ATCPriceAction />;
       case MarketTab.ACTIVE_BUY_SELL:
