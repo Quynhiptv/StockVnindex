@@ -1,8 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
 
-const ATC_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1041014389';
-const PRICE_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
+const ATC_FOREIGN_ID = import.meta.env.VITE_ATC_FOREIGN_SHEET_ID || '13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c';
+const PRICE_DATA_ID = import.meta.env.VITE_PRICE_DATA_SHEET_ID || '13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c';
+
+const ATC_DATA_URL = `https://docs.google.com/spreadsheets/d/${ATC_FOREIGN_ID}/export?format=csv&gid=1041014389`;
+const PRICE_DATA_URL = `https://docs.google.com/spreadsheets/d/${PRICE_DATA_ID}/export?format=csv&gid=1628670680`;
 
 interface ATCStockData {
   symbol: string;

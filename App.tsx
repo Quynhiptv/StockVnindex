@@ -17,8 +17,34 @@ import RecommendationPortfolio from './components/RecommendationPortfolio';
 import SectorAnalysis from './components/SectorAnalysis';
 import TopVolatility from './components/TopVolatility';
 import SystemSettings from './components/SystemSettings';
+import Login from './components/Login';
 
 const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const session = localStorage.getItem('auth_session');
+    if (session) {
+      try {
+        const { expiry, isLoggedIn: storedIn } = JSON.parse(session);
+        if (storedIn && new Date().getTime() < expiry) {
+          setIsLoggedIn(true);
+        } else {
+          localStorage.removeItem('auth_session');
+        }
+      } catch (e) {
+        localStorage.removeItem('auth_session');
+      }
+    }
+    setIsAuthLoading(false);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_session');
+    setIsLoggedIn(false);
+  };
+
   const [activeTab, setActiveTab] = useState<MarketTab>(() => {
     const savedTab = localStorage.getItem('activeTab');
     if (savedTab && Object.values(MarketTab).includes(savedTab as MarketTab)) {
@@ -97,10 +123,35 @@ const App: React.FC = () => {
     }
   };
 
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return <Login onLoginSuccess={() => setIsLoggedIn(true)} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col pb-10 bg-slate-50 selection:bg-blue-100 selection:text-blue-900">
       <header>
         <Banner />
+        <div className="container mx-auto px-4 absolute top-4 right-0 z-50 pointer-events-none">
+          <div className="flex justify-end pointer-events-auto">
+            <button 
+              onClick={handleLogout}
+              className="bg-white/90 backdrop-blur-sm border border-slate-200 text-slate-600 hover:text-rose-600 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-sm transition-all flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Đăng xuất
+            </button>
+          </div>
+        </div>
       </header>
 
       <div className="sticky top-0 z-40">

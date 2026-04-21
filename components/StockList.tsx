@@ -1,8 +1,11 @@
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 
-const STOCK_LIST_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1358455783';
-const PRICE_DATA_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
+const STOCK_DATA_ID = import.meta.env.VITE_STOCK_DATA_SHEET_ID || '13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c';
+const PRICE_DATA_ID = import.meta.env.VITE_PRICE_DATA_SHEET_ID || '13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c';
+
+const STOCK_LIST_URL = `https://docs.google.com/spreadsheets/d/${STOCK_DATA_ID}/export?format=csv&gid=1358455783`;
+const PRICE_DATA_URL = `https://docs.google.com/spreadsheets/d/${PRICE_DATA_ID}/export?format=csv&gid=1628670680`;
 
 const TELEGRAM_BOT_TOKEN = '8213831667:AAGsz3XcF-18Iv5hFWSbHwWsdN80860dC6w';
 const TELEGRAM_CHAT_ID = '-1003876897678';

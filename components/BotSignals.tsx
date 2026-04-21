@@ -1,8 +1,11 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 
-const SIGNALS_SHEET_URL = 'https://docs.google.com/spreadsheets/d/12iFNV5uHO6k0JhOI_6MDwRBfpvyMpKMY-f1ucj3Jd9k/export?format=csv&gid=1277996624';
-const PRICE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c/export?format=csv&gid=1628670680';
+const BOT_SIGNALS_ID = import.meta.env.VITE_BOT_SIGNALS_SHEET_ID || '12iFNV5uHO6k0JhOI_6MDwRBfpvyMpKMY-f1ucj3Jd9k';
+const PRICE_DATA_ID = import.meta.env.VITE_PRICE_DATA_SHEET_ID || '13z2aWAtAdjdxQ83vttmicRk9dXd6WqGiQoedGjHFD5c';
+
+const SIGNALS_SHEET_URL = `https://docs.google.com/spreadsheets/d/${BOT_SIGNALS_ID}/export?format=csv&gid=1277996624`;
+const PRICE_SHEET_URL = `https://docs.google.com/spreadsheets/d/${PRICE_DATA_ID}/export?format=csv&gid=1628670680`;
 
 interface RawSignal {
   sentTime: string;    // Col A
